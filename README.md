@@ -7,8 +7,8 @@ CMPE 273 SJSU Project
 
 Team Members:
 
-Saideepak Budaraju
-Muffadal Daginawala
-Amey More
-Pouya Jafarian
+Saideepak Budaraju,
+Muffadal Daginawala,
+Amey More,
+Pouya Jafarian,
 Nitin
