@@ -6,7 +6,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 function insertTransaction(callback,json){
 	
-	if(json.timeRequested && json.bikeId && json.pickUpPointStationId && json.bookingStartTime && json.dropOffPointStationId && json.bikerUsername && json.cost && json.bikerName && json.bikeName)
+	if(json.timeRequested && json.bikeId && json.pickUpPointStationId && json.bookingStartTime && json.dropOffPointStationId && json.bikerUsername && json.cost && json.bikerName && json.bikeName && json.bikerEmail)
 	{
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			if(err){
@@ -21,7 +21,7 @@ function insertTransaction(callback,json){
 
 				db.collection("receipts", function (err, connection){
 
-					connection.insert({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
+					connection.insert({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost, 'bikerEmail': json.bikerEmail},function (err,result){
 
 						if(err){
 							console.log(err);
@@ -102,7 +102,7 @@ function removeTransaction(json){
 			{
 				db.collection("receipts", function (err, connection){
 
-					connection.remove({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
+					connection.remove({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost, 'bikerEmail': json.bikerEmail},function (err,result){
 						
 						if(err){
 							console.log(err);

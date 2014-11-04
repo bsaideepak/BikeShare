@@ -5,13 +5,12 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var stations = require("./routes/stations");
-var bike = require("./routes/bike");
-var receipt = require("./routes/receipt");
+var controller = require("./routes/controller");
 
-var bikeStation = require("../util/bikeStation");
-var bike = require("../util/bike");
-var receipt = require("../util/receipt");
+var bikeStationDB = require("../util/bikeStationDB");
+var bikeDB = require("../util/bikeDB");
+var receiptDB = require("../util/receiptDB");
+var userAccountsDB = require("../util/userAccountsDB");
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -26,6 +25,19 @@ var allowCrossDomain = function(req, res, next) {
 
 
 var app = express();
+var RedisStore = require('connect-redis')(express);
+
+app.use(express.cookieParser());
+app.use(express.session({
+  store: new RedisStore({
+    host: 'localhost',
+    port: 6379,
+    db: 2,
+    pass: 'RedisPASS'
+  }),
+  secret: '1234567890QWERTY'
+}));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -38,11 +50,13 @@ app.set('port', process.env.PORT || 3000);
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(express.cookieParser());
+//app.use(express.session({secret: '1234567890QWERTY'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -52,10 +66,15 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', routes.index); //Record Current Location.
-app.get('/stations', stations.getNearByStations);  //Nearby Stations in Green, others in Red.
-app.post('/bikeDetails',bike.getBikesInfo);   //JSON having bike info, for all bikes available in the station.
-app.post('/selectBike',receipt.generateReceipt);  //Generate receipt for the transaction.
+app.post('/login',controller.userLogin);  //User Login.
+app.get('/stations', controller.getNearByStations);  //Nearby Stations in Green, others in Red.
+app.post('/bikeDetails',controller.getBikesInfo);   //JSON having bike info, for all bikes available in the station.
+app.post('/selectBike',controller.generateReceipt);  //Generate receipt for the transaction.
 
+app.all('*', function(req, res){
+    //res.render(index.ejs)
+    res.send(404);
+})
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

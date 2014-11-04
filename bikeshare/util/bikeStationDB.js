@@ -149,4 +149,46 @@ function findAllBikeStations(callback){
 		}
 	});
 }
-exports.removeBikeStation = removeBikeStation;
+exports.findAllBikeStations = findAllBikeStations;
+
+
+
+function findAllBikeStationsWhereEmptySlotsExist(callback){
+
+	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+
+		if(err){
+				console.log("Error: "+err);
+				db.close();
+		}
+		else
+		{
+			db.collection("bikeStation", function (err, connection){
+				if(err){
+					console.log("No such database exists.");
+					db.close();
+				}
+				else{
+					connection.find({'emptySlots': { $gt:0 } }, function(err,result){
+						if(err){
+							console.log("No order exists.");
+							db.close();
+						}
+						else{
+							db.close();
+							callback(err,result);
+						}
+					});
+				}
+
+			});
+		}
+	});
+}
+exports.findAllBikeStationsWhereEmptySlotsExist = findAllBikeStationsWhereEmptySlotsExist;
+
+
+
+
+//Function to find Nearest Lovations of bikeStations.
+
