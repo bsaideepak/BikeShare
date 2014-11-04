@@ -3,6 +3,9 @@ var bikeStationDB = require("../util/bikeStationDB");
 var bikeDB = require("../util/bikeDB");
 var receiptDB = require("../util/receiptDB");
 
+var latitude;
+var longitude;
+
  exports.userLogin = function (req, res) {
 	if(!req.body.hasOwnProperty('username') || !req.body.hasOwnProperty('password')) {
 		res.statusCode = 400;
@@ -11,6 +14,13 @@ var receiptDB = require("../util/receiptDB");
 	var json = [];
 	json.username = req.body.username;
 	json.password = req.body.password;
+
+	req.session.latitude = req.body.latitude;
+	req.session.longitude = req.body.longitude;
+
+	latitude = req.session.latitude;
+	longitude = req.session.longitude;
+
 	
 	userAccountsDB.userLogin(function(err,results){
 		if(err){
@@ -144,12 +154,4 @@ exports.confirmBikeReservation = function(req, res) {
 
 	},json);
 }
-
-
-exports.homepage = function(req, res) {
-
-	//res.render('../views/homepage.ejs');
-
-}
-
 

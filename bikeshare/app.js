@@ -72,7 +72,7 @@ app.post('/bikeDetails',controller.getBikesInfo);   //JSON having bike info, for
 app.post('/selectBike',controller.generateReceipt);  //Generate receipt for the transaction.
 
 app.all('*', function(req, res){
-    //res.render(index.ejs)
+    //res.render(homepage.ejs)
     res.send(404);
 })
 
