@@ -6,7 +6,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 function insertTransaction(callback,json){
 	
-	if(json.timeRequested && json.bikeId && json.pickUpPoint && json.startTime && json.dropOffPoint && json.bikerName && json.cost && json.bikerName)
+	if(json.timeRequested && json.bikeId && json.pickUpPointStationId && json.bookingStartTime && json.dropOffPointStationId && json.bikerUsername && json.cost && json.bikerName && json.bikeName)
 	{
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			if(err){
@@ -21,7 +21,7 @@ function insertTransaction(callback,json){
 
 				db.collection("receipts", function (err, connection){
 
-					connection.insert({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPoint,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPoint,'bookingEndTime':json.bookingEndTime, 'bikerName':json.bikerName,'bikeId':json.bikeId,'bikerName':json.bikerName,'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
+					connection.insert({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
 
 						if(err){
 							console.log(err);
@@ -51,8 +51,8 @@ exports.insertTransaction = insertTransaction;
 
 function updateTransaction(json){
 
-	if(json.timeRequested && json.bikeId && json.pickUpPoint && json.dropOffPoint && json.bikerName && json.cost && json.bikerName){
-
+	if(json.timeRequested && json.bikeId && json.pickUpPointStationId && json.bookingStartTime && json.dropOffPointStationId && json.bikerUsername && json.cost && json.bikerName && json.bikeName)
+	{
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 
 			if(err){
@@ -63,7 +63,7 @@ function updateTransaction(json){
 			{	
 				db.collection("receipts", function (err, connection){
 
-					cconnection.findAndModify({query: {'bikeId': json.bikeId , 'bookingStartTime': json.bookingStartTime },update: { $set: { 'bookingStartTime':json.bookingStartTime, 'bookingEndTime':json.bookingEndTime, 'pickUpPoint':json.pickUpPoint, 'dropOffPoint':json.dropOffPoint } }, upsert: true },function(err,result){
+					cconnection.findAndModify({query: {'transactionId': json.transactionId , 'bikerUsername': json.bikerUsername },update: { $set: { 'bookingStartTime':json.bookingStartTime, 'bookingEndTime':json.bookingEndTime, 'pickUpPointStationId':json.pickUpPointStationId, 'dropOffPointStationId':json.dropOffPointStationId } }, upsert: true },function(err,result){
 
 						if(err){
 							console.log(err);
@@ -102,7 +102,7 @@ function removeTransaction(json){
 			{
 				db.collection("receipts", function (err, connection){
 
-					connection.remove({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPoint,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPoint,'bookingEndTime':json.bookingEndTime, 'bikerName':json.bikerName,'bikeId':json.bikeId,'bikerName':json.bikerName,'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
+					connection.remove({'transactionId':json.transactionId,'pickUpPoint':json.pickUpPointStationId,'bookingStartTime':json.bookingStartTime,'dropOffPoint':json.dropOffPointStationId,'bookingEndTime':json.bookingEndTime, 'bikeName':json.bikeName,'bikeId':json.bikeId,'bikerName':json.bikerName, 'bikerUsername':json.bikerUsername, 'timeRequested':json.timeRequested,'cost':json.cost},function (err,result){
 						
 						if(err){
 							console.log(err);
@@ -196,7 +196,7 @@ function findAllTransactionsByTransactionId(callback,transactionId){
 exports.findAllTransactionsByTransactionId = findAllTransactionsByTransactionId;
 
 
-function findAllTransactionsByBikerName(callback,bikerName){
+function findAllTransactionsByBikerUsername(callback,bikerName){
 
 	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 
@@ -213,7 +213,7 @@ function findAllTransactionsByBikerName(callback,bikerName){
 					db.close();
 				}
 				else{
-					connection.find({"bikerName":bikerName},function(err,result){
+					connection.find({"bikerUsername":bikerUsername},function(err,result){
 						if(err){
 							console.log("No order exists.");
 							db.close();
@@ -229,4 +229,4 @@ function findAllTransactionsByBikerName(callback,bikerName){
 		}
 	});
 }
-exports.findAllTransactionsByBikerName = findAllTransactionsByBikerName;
+exports.findAllTransactionsByBikerUsername = findAllTransactionsByBikerUsername;
