@@ -66,14 +66,17 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', routes.index); //Record Current Location.
-app.post('/login',controller.checkSessionExists, controller.userLogin);  //User Login.
-app.get('/stations', cotroller.checkSessionExists, controller.showBikeStations);  //Nearby Stations in Green, others in Red.
-app.post('/bikeDetails',controller.checkSessionExists, controller.getBikesInfo);   //JSON having bike info, for all bikes available in the station.
-app.post('/selectBike',controller.checkSessionExists, controller.generateReceipt);  //Generate receipt for the transaction.
+app.post('/login', controller.userLogin);  //User Login.
+app.post('/signup', controller.signup);  //User Signup/Registeration.
+app.post('/stations', cotroller.checkSessionExists, controller.showAvailableBikeStations);  //Nearby Stations in Green, others in Red.
+app.post('/bikeDetails',controller.checkSessionExists, controller.getbikeDetails);   //JSON having bike info, for all bikes available in the station.
+app.post('/tripConfirmation',controller.checkSessionExists, controller.tripConfirmation);  //Trip Confirmation & selection of dropOffPoint.
+app.post('/receipt',controller.checkSessionExists, controller.generateReceipt);  //Generate receipt for the transaction.
+app.get('/acknowledgement',controller.checkSessionExists, controller.acknowledgement);  //Thank You Page.
 
 app.all('*', function(req, res){
-    //res.render(homepage.ejs)
-    res.send(404);
+    res.render('homepage');
+    //res.send(404);
 })
 
 http.createServer(app).listen(app.get('port'), function(){

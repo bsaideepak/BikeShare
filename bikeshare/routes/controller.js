@@ -12,12 +12,12 @@ var latitude;
 var longitude;
 
  exports.userLogin = function (req, res) {
-	if(!req.body.hasOwnProperty('username') || !req.body.hasOwnProperty('password')) {
+	if(!req.body.hasOwnProperty('userEmail') || !req.body.hasOwnProperty('password')) {
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 	var json = [];
-	json.username = req.body.username;
+	json.userEmail = req.body.userEmail;
 	json.password = req.body.password;
 
 	req.session.latitude = req.body.latitude;
@@ -35,8 +35,8 @@ var longitude;
 		{
 			if(results==1){
 
-				req.session.username = req.body.username;
-				console.log(req.session.username);
+				req.session.userEmail = req.body.userEmail;
+				console.log(req.session.userEmail);
 
 				//res.render('../views/bikeStations.ejs');
 				console.log("success");
@@ -54,7 +54,7 @@ var longitude;
 
 
 exports.checkSessionExists = function(req, res, next) {
-	if(req.session.username){
+	if(req.session.userEmail){
 		next();
 	}
 	else{
@@ -62,7 +62,7 @@ exports.checkSessionExists = function(req, res, next) {
 	}
 }
 
-exports.showBikeStations = function(req, res) {
+exports.showAvailableBikeStations = function(req, res) {
 
 	if(!req.body.hasOwnProperty('latitude') || !req.body.hasOwnProperty('longitude')) {
 		res.statusCode = 400;
@@ -84,7 +84,7 @@ exports.showBikeStations = function(req, res) {
 	}/*,json*/);
 }
 
-exports.showBikes = function(req, res) {
+exports.getbikeDetails = function(req, res) {
 
 	if(!req.body.hasOwnProperty('latitude') || !req.body.hasOwnProperty('longitude') || !req.body.hasOwnProperty('currentStationId')) {
 		res.statusCode = 400;
@@ -107,7 +107,7 @@ exports.showBikes = function(req, res) {
 }
 
 
-exports.reserveBike = function(req, res) {
+exports.tripConfirmation = function(req, res) {
 
 	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bikeName') || !req.body.hasOwnProperty('availableUpto') || !req.body.hasOwnProperty('bookingStartTime') || !req.body.hasOwnProperty('bookingEndTime') || !req.body.hasOwnProperty('costPerHr') || !req.body.hasOwnProperty('currentStationId') ) {
 		res.statusCode = 400;
@@ -134,7 +134,7 @@ exports.reserveBike = function(req, res) {
 }
 
 
-exports.confirmBikeReservation = function(req, res) {
+exports.generateReceipt = function(req, res) {
 
 	if(!req.body.hasOwnProperty('dropOffPoint') ) {
 		res.statusCode = 400;

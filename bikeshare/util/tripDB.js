@@ -11,7 +11,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 function insertTrip(callback,json){
 	
-	if(json.timeRequested && json.bookingStartTime && json.bookingEndTime && json.pickUpPoint && json.dropOffPoint && json.userEmail && json.bikeId && json.bikeName && json.tripStatus)
+	if(json.timeRequested && json.bookingStartTime && json.bookingEndTime && json.bookingDay && json.pickUpPoint && json.dropOffPoint && json.userEmail && json.bikeId && json.bikeName && json.tripStatus)
 	{
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			if(err){
@@ -56,7 +56,7 @@ function insertTrip(callback,json){
 
 				db.collection("trip", function (err, connection){
 
-					connection.insert({'tripId':json.tripId,'timeRequested':json.timeRequested,'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime ,'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'userEmail':json.userEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'costPerHr': json.costPerHr},function (err,result){
+					connection.insert({'tripId':json.tripId,'timeRequested':json.timeRequested,'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime ,'bookingDay':json.bookingDay, 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'userEmail':json.userEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'costPerHr': json.costPerHr},function (err,result){
 
 						if(err){
 							console.log(err);
@@ -125,7 +125,7 @@ exports.updateTripStatus = updateTripStatus;
 
 function removeTrip(json){
 
-	if(json.tripId && json.timeRequested && json.bookingStartTime && json.bookingEndTime && json.pickUpPoint && json.dropOffPoint && json.userEmail && json.bikeId && json.bikeName && json.tripStatus)
+	if(json.tripId && json.timeRequested && json.bookingStartTime && json.bookingEndTime && json.bookingDay && json.pickUpPoint && json.dropOffPoint && json.userEmail && json.bikeId && json.bikeName && json.tripStatus)
 	{
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -137,7 +137,7 @@ function removeTrip(json){
 			{
 				db.collection("trip", function (err, connection){
 
-					connection.remove({'tripId':json.tripId,'timeRequested':json.timeRequested,'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime ,'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'userEmail':json.userEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus , 'costPerHr': json.costPerHr},function (err,result){
+					connection.remove({'tripId':json.tripId,'timeRequested':json.timeRequested,'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime ,'bookingDay':json.bookingDay, 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'userEmail':json.userEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus , 'costPerHr': json.costPerHr},function (err,result){
 						
 						if(err){
 							console.log(err);

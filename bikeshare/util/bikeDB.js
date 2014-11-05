@@ -22,7 +22,7 @@ function insertBike(json){
 				//json.orderId = json.firstname + timeStamp + json.lastname; 
 				db.collection("bike", function (err, connection){
 				
-					connection.insert({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto,'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'categoryPriority':json.categoryPriority,  'currentStationId':json.currentStationId},function (err,result){
+					connection.insert({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime,'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'currentStationId':json.currentStationId},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -58,7 +58,7 @@ function updateBikeInfo(json){
 			{	
 				db.collection("bike", function (err, connection){
 
-					cconnection.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'availableUpto':json.availableUpto, 'currentStationId':json.currentStationId } }, upsert: true },function(err,result){
+					cconnection.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime, 'currentStationId':json.currentStationId } }, upsert: true },function(err,result){
 
 						if(err){
 							console.log(err);
@@ -98,7 +98,7 @@ function removeBike(json){
 			{
 				db.collection("bike", function (err, connection){
 
-					connection.remove({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto, 'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'categoryPriority':json.categoryPriority,  'currentStationId':json.currentStationId},function (err,result){
+					connection.remove({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime, 'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority,'currentStationId':json.currentStationId},function (err,result){
 						
 						if(err){
 							console.log(err);

@@ -18,7 +18,7 @@ function newUser(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.insert({'userEmail':json.userEmail,'password':json.password},function (err,result){
+					connection.insert({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -57,7 +57,7 @@ function changeUserPassword(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.findAndModify({query: {'userEmail':json.userEmail, 'password':json.password}, update: {$set: {'userEmail':json.userEmail,'password':json.newPassword } },upsert: true},function (err,result){
+					connection.findAndModify({query: {'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress }, update: {$set: {'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress } },upsert: true},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -95,7 +95,7 @@ function removeUser(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.remove({'userEmail':json.userEmail,'password':json.password},function (err,result){
+					connection.remove({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -136,7 +136,7 @@ function userLogin(callback,json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.find({'userEmail':json.userEmail,'password':json.password},function (err,result){
+					connection.find({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
 					
 						if(err){
 							authenticated = 0;
