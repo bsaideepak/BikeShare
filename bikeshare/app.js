@@ -66,10 +66,10 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', routes.index); //Record Current Location.
-app.post('/login',controller.userLogin);  //User Login.
-app.get('/stations', controller.getNearByStations);  //Nearby Stations in Green, others in Red.
-app.post('/bikeDetails',controller.getBikesInfo);   //JSON having bike info, for all bikes available in the station.
-app.post('/selectBike',controller.generateReceipt);  //Generate receipt for the transaction.
+app.post('/login',controller.checkSessionExists, controller.userLogin);  //User Login.
+app.get('/stations', cotroller.checkSessionExists, controller.showBikeStations);  //Nearby Stations in Green, others in Red.
+app.post('/bikeDetails',controller.checkSessionExists, controller.getBikesInfo);   //JSON having bike info, for all bikes available in the station.
+app.post('/selectBike',controller.checkSessionExists, controller.generateReceipt);  //Generate receipt for the transaction.
 
 app.all('*', function(req, res){
     //res.render(homepage.ejs)

@@ -6,7 +6,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 function insertBike(json){
 	
-	if(json.bikeId && json.bikeId && json.bikeName && json.costPerHr && json.currentStationId){
+	if(json.bikeId && json.bikeId && json.bikeName && json.currentStationId){
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -22,7 +22,7 @@ function insertBike(json){
 				//json.orderId = json.firstname + timeStamp + json.lastname; 
 				db.collection("bike", function (err, connection){
 				
-					connection.insert({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto, 'bookingStartTime':json.bookingStartTime, 'bookingEndTime':json.bookingEndTime,'costPerHr':json.costPerHr, 'currentStationId':json.currentStationId},function (err,result){
+					connection.insert({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto,'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'categoryPriority':json.categoryPriority,  'currentStationId':json.currentStationId},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -45,7 +45,7 @@ exports.insertBike = insertBike;
 
 function updateBikeInfo(json){
 
-	if(json.bikeId && json.bikeId && json.bikeName && json.costPerHr){
+	if(json.bikeId && json.bikeId && json.bikeName){
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 
@@ -58,7 +58,7 @@ function updateBikeInfo(json){
 			{	
 				db.collection("bike", function (err, connection){
 
-					cconnection.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'availableUpto':json.availableUpto, 'bookingStartTime':json.bookingStartTime, 'bookingEndTime':json.bookingEndTime, 'currentStationId':json.currentStationId } }, upsert: true },function(err,result){
+					cconnection.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'availableUpto':json.availableUpto, 'currentStationId':json.currentStationId } }, upsert: true },function(err,result){
 
 						if(err){
 							console.log(err);
@@ -85,7 +85,7 @@ exports.updateBikeInfo = updateBikeInfo;
 
 function removeBike(json){
 
-	if(json.bikeId && json.bikeId && json.bikeName && json.costPerHr){
+	if(json.bikeId && json.bikeId && json.bikeName){
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -98,7 +98,7 @@ function removeBike(json){
 			{
 				db.collection("bike", function (err, connection){
 
-					connection.remove({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto, 'bookingStartTime':json.bookingStartTime, 'bookingEndTime':json.bookingEndTime,'costPerHr':json.costPerHr, 'currentStationId':json.currentStationId },function (err,result){
+					connection.remove({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableUpto':json.availableUpto, 'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'categoryPriority':json.categoryPriority,  'currentStationId':json.currentStationId},function (err,result){
 						
 						if(err){
 							console.log(err);
@@ -128,6 +128,7 @@ function findAllBikes(callback){
 		if(err){
 				console.log("Error: "+err);
 				db.close();
+				callback(err,new Error("Error: "+ err));
 		}
 		else
 		{
@@ -136,6 +137,7 @@ function findAllBikes(callback){
 				if(err){
 					console.log("No such database exists.");
 					db.close();
+					callback(err,new Error("Error: "+ err));
 				}
 				else{
 					connection.find(function(err,result){
@@ -143,6 +145,7 @@ function findAllBikes(callback){
 						if(err){
 							console.log("No order exists.");
 							db.close();
+							callback(err,new Error("Error: "+ err));
 						}
 						else{
 							callback(err,result);
@@ -164,6 +167,7 @@ function findAllBikesByCurrentStationId(callback, currentStationId){
 		if(err){
 				console.log("Error: "+err);
 				db.close();
+				callback(err,new Error("Error: "+ err));
 		}
 		else
 		{
@@ -172,6 +176,7 @@ function findAllBikesByCurrentStationId(callback, currentStationId){
 				if(err){
 					console.log("No such database exists.");
 					db.close();
+					callback(err,new Error("Error: "+ err));
 				}
 				else{
 					connection.find({'currentStationId':currentStationId},function(err,result){
@@ -179,6 +184,7 @@ function findAllBikesByCurrentStationId(callback, currentStationId){
 						if(err){
 							console.log("No order exists.");
 							db.close();
+							callback(err,new Error("Error: "+ err));
 						}
 						else{
 							callback(err,result);
@@ -192,3 +198,45 @@ function findAllBikesByCurrentStationId(callback, currentStationId){
 	});
 }
 exports.findAllBikesByCurrentStationId = findAllBikesByCurrentStationId;
+
+
+function findBikeById(callback, bikeId){
+
+	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+
+		if(err){
+				console.log("Error: "+err);
+				db.close();
+				callback(err,new Error("Error: "+ err));
+		}
+		else
+		{
+			db.collection("bike", function (err, connection){
+
+				if(err){
+					console.log("No such database exists.");
+					db.close();
+					callback(err,new Error("Error: "+ err));
+				}
+				else{
+					connection.find({'bikeId':bikeId},function(err,result){
+
+						if(err){
+							console.log("No bike exists.");
+							db.close();
+							callback(err,new Error("Error: "+ err));
+						}
+						else{
+							callback(err,result);
+							db.close();
+						}
+					});
+				}
+
+			});
+		}
+	});
+}
+exports.findBikeById = findBikeById;
+
+

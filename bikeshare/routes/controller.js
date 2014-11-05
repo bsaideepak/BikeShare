@@ -1,3 +1,8 @@
+/**
+ * Author: Sai
+ */
+
+
 var userAccountsDB = require("../util/userAccountsDB");
 var bikeStationDB = require("../util/bikeStationDB");
 var bikeDB = require("../util/bikeDB");
@@ -109,14 +114,14 @@ exports.reserveBike = function(req, res) {
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 
-	//var json = [];
-	req.session.bikeId = req.body.bikeId;
-	req.session.bikeName = req.body.bikeName;
-	req.session.availableUpto = req.body.availableUpto;
-	req.session.bookingStartTime = req.body.bookingStartTime;
-	req.session.bookingEndTime = req.body.bookingEndTime;
-	req.session.costPerHr = req.body.costPerHr;
-	req.session.currentStationId = req.body.currentStationId;
+	var json = [];
+	json.bikeId = req.body.bikeId;
+	json.bikeName = req.body.bikeName;
+	json.availableUpto = req.body.availableUpto;
+	json.bookingStartTime = req.body.bookingStartTime;
+	json.bookingEndTime = req.body.bookingEndTime;
+	json.costPerHr = req.body.costPerHr;
+	json.currentStationId = req.body.currentStationId;
 
 	bikeStationDB.findAllBikeStationsWhereEmptySlotsExist(function(err,result){
 

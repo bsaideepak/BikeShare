@@ -1,8 +1,12 @@
+/**
+ * Author: Sai
+ */
+
 var MongoClient = require('mongodb').MongoClient;
 
 function newUser(json){
 	
-	if(json.username && json.password && json.emailId){
+	if(json.userEmail && json.password{
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -14,7 +18,7 @@ function newUser(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.insert({'username':json.username,'password':json.password,'emailId':json.emailId},function (err,result){
+					connection.insert({'userEmail':json.userEmail,'password':json.password},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -41,7 +45,7 @@ exports.newUser = newUser;
 
 function changeUserPassword(json){
 	
-	if(json.username && json.password && json.emailId){
+	if(json.userEmail && json.password){
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -53,7 +57,7 @@ function changeUserPassword(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.findAndModify({query: {'username':json.username, 'password':json.password}, update: {$set: {'username':json.username,'password':json.newPassword } },upsert: true},function (err,result){
+					connection.findAndModify({query: {'userEmail':json.userEmail, 'password':json.password}, update: {$set: {'userEmail':json.userEmail,'password':json.newPassword } },upsert: true},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -79,7 +83,7 @@ exports.changeUserPassword = changeUserPassword;
 
 function removeUser(json){
 	
-	if(json.username && json.password && json.emailId){
+	if(json.userEmail && json.password){
 
 		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
 			
@@ -91,7 +95,7 @@ function removeUser(json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.remove({'username':json.username,'password':json.password,'emailId':json.emailId},function (err,result){
+					connection.remove({'userEmail':json.userEmail,'password':json.password},function (err,result){
 					
 						if(err){
 							console.log(err);
@@ -118,7 +122,7 @@ exports.removeUser = removeUser;
 
 function userLogin(callback,json){
 	
-	if(json.username && json.password){
+	if(json.userEmail && json.password){
 
 		var authenticated;
 
@@ -132,7 +136,7 @@ function userLogin(callback,json){
 			{	
 				db.collection("userAccounts", function (err, connection){
 				
-					connection.find({'username':json.username,'password':json.password},function (err,result){
+					connection.find({'userEmail':json.userEmail,'password':json.password},function (err,result){
 					
 						if(err){
 							authenticated = 0;
@@ -142,7 +146,7 @@ function userLogin(callback,json){
 					
 						else{
 							
-							var username;
+							var userEmail;
 							var password;
 							
 							result.toArray(function(err,docs){
@@ -150,10 +154,10 @@ function userLogin(callback,json){
 								if(!docs.length==0)
 								{
 									//console.log(docs);
-									username = docs[0].username;
+									userEmail = docs[0].userEmail;
 									password = docs[0].password;
 
-									if(json.username==username && json.password == password)
+									if(json.userEmail==userEmail && json.password == password)
 									{
 										authenticated = 1;
 										console.log("User Authenticated");
