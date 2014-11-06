@@ -100,7 +100,7 @@ exports.showAvailableBikeStations = function(req, res) {
 	}/*,json*/);
 }
 
-exports.getbikeDetails = function(req, res) {
+exports.getBikeDetails = function(req, res) {
 
 	if(!req.body.hasOwnProperty('latitude') || !req.body.hasOwnProperty('longitude') || !req.body.hasOwnProperty('currentStationId')) {
 		res.statusCode = 400;

@@ -69,7 +69,7 @@ app.get('/', routes.index); //Record Current Location.
 app.post('/login', controller.userLogin);  //User Login.
 app.post('/signup', controller.signup);  //User Signup/Registeration.
 app.post('/stations', cotroller.checkSessionExists, controller.showAvailableBikeStations);  //Nearby Stations in Green, others in Red.
-app.post('/bikeDetails',controller.checkSessionExists, controller.getbikeDetails);   //JSON having bike info, for all bikes available in the station.
+app.post('/bikeDetails',controller.checkSessionExists, controller.getBikeDetails);   //JSON having bike info, for all bikes available in the station.
 app.post('/tripConfirmation',controller.checkSessionExists, controller.tripConfirmation);  //Trip Confirmation & selection of dropOffPoint.
 app.post('/receipt',controller.checkSessionExists, controller.generateReceipt);  //Generate receipt for the transaction.
 app.get('/acknowledgement',controller.checkSessionExists, controller.acknowledgement);  //Thank You Page.
