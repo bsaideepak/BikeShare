@@ -52,6 +52,22 @@ var longitude;
 	},json);
 }
 
+exports.signup = function (req, res) {
+	if(!req.body.hasOwnProperty('userEmail') || !req.body.hasOwnProperty('password') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('bikerAddress') ) {
+		res.statusCode = 400;
+		return res.send('Error 400: Post syntax incorrect.');
+	}
+	var json = [];
+	json.userEmail = req.body.userEmail;
+	json.password = req.body.password;
+	json.bikerName = req.body.bikerName;
+	json.bikerAddress = req.body.bikerAddress;
+
+	userAccountsDB.newUser(json);
+
+}
+
+
 
 exports.checkSessionExists = function(req, res, next) {
 	if(req.session.userEmail){

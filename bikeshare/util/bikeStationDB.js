@@ -273,7 +273,62 @@ function findLocationPriorityByBikeStationId(callback,stationId){
 exports.findLocationPriorityByBikeStationId = findLocationPriorityByBikeStationId;
 
 
+function decreaseResourceCountAndIncreaseEmptySlots(stationId){
 
+	db.collection("servers", function (err, connection){
+
+		if(!err){
+
+			connection.findAndModify({query: {"stationId": stationId },update: { $inc: { "resourceCount": 1 , "emptySlots": -1} }, upsert: true },function(err,result){
+
+				if(err){
+					console.log("Error WHile Updating.");
+					common.closeConnection(db);
+				}
+				else{
+					console.log("Recorded Updated.");
+					common.closeConnection(db);
+				}
+			});
+		}
+		else{
+			console.log("Error in connection.");
+			common.closeConnection(db);
+		}
+	});
+}
+
+exports.decreaseResourceCountAndIncreaseEmptySlots = decreaseResourceCountAndIncreaseEmptySlots;
+
+
+function returnBike(stationId){
+
+	db.collection("servers", function (err, connection){
+
+		if(!err){
+
+			connection.findAndModify({query: {"stationId": stationId },update: { $inc: { "resourceCount": -1 , "emptySlots": 1} }, upsert: true },function(err,result){
+
+				if(err){
+					console.log("Error WHile Updating.");
+					common.closeConnection(db);
+				}
+				else{
+					console.log("Recorded Updated.");
+					common.closeConnection(db);
+				}
+			});
+		}
+		else{
+			console.log("Error in connection.");
+			common.closeConnection(db);
+		}
+	});
+}
+
+exports.returnBike = returnBike;
+
+//update resourceCount and emptySlots.
 
 //Function to find Nearest Lovations of bikeStations.
 

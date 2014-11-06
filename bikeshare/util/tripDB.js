@@ -39,6 +39,10 @@ function insertTrip(callback,json){
 
 									if(!err){
 										costOverheads.locationPriority = locationP;
+
+										bikeStationDB.decreaseResourceCountAndIncreaseEmptySlots(json.pickUpPoint);
+
+
 									}
 
 								}json.pickUpPoint);
@@ -236,6 +240,6 @@ function findAllTripsByTripId(callback,tripId){
 }
 exports.findAllTripsByTripId = findAllTripsByTripId;
 
-
+//Update bikeStation resourceCount & emptySlots based on dropOffPoint & bookingEndTime
 
 
