@@ -8,7 +8,7 @@ var collectionName = "userAccounts";
 
 function newUser(json){
 	
-	if(json.bikerContactEmail && json.bikerPassword{
+	if(json.bikerContactEmail && json.bikerPassword){
 
 		mongo.getConnection(function(err,coll){
 		if(err){

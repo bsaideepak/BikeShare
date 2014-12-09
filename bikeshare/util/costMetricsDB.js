@@ -470,7 +470,7 @@ function getCostPerHr(callback,json){
 		if(!err){
 			percentages.insurancePercentage = percentageValue;
 		}
-	} json.insurancePriority);
+	},json.insurancePriority);
 
 	var costPerHr = 5 + (5*percentages.timePercentage/100) + (5*percentages.insurancePercentage/100) + (5*percentages.categoryPercentage/100) + (5*percentages.locationPercentage/100);
 

@@ -1,11 +1,10 @@
 /**
  * Author: Sai
  */
-
-var bikeDB = require("./util/bikeDB");
-var costMetricsDB = require("./util/costMetricsDB");
-var bikeStationDB = require("./util/bikeStationDB");
-var receipt = require("./util/receipt");
+var costMetricsDB = require("../util/costMetricsDB");
+var bikeStationDB = require("../util/bikeStationDB");
+var bikeDB = require("../util/bikeDB");
+var receipt = require("../util/receiptsDB");
 
 var mongo = require("../util/MongoDBConnectionPool");
 var dbc="j";
@@ -57,7 +56,7 @@ function insertTrip(callback,json){
 			else{
 				console.log(err);
 			}
-		}costOverheads);
+		},costOverheads);
 
 		dbc.insert({'tripId':json.tripId, 'bookingStartTimeHours':json.bookingStartTimeHours,'bookingStartTimeMinutes':json.bookingStartTimeMinutes,'bookingEndTimeHours':json.bookingEndTimeHours ,'bookingEndTimeMinutes':json.bookingEndTimeMinutes , 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'bikerContactEmail':json.bikerContactEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'tripCostPerHr': json.tripCostPerHr, 'bikeMaintainanceScale':json.bikeMaintainanceScale},function (err,result){
 
@@ -246,7 +245,7 @@ function findTripByBikerContactEmail(callback,bikerContactEmail){
 	});
 }
 
-exports.bikerContactEmail = bikerContactEmail;
+exports.findTripByBikerContactEmail = findTripByBikerContactEmail;
 
 
 

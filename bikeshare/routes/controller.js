@@ -6,8 +6,8 @@
 var userAccountsDB = require("../util/userAccountsDB");
 var bikeStationDB = require("../util/bikeStationDB");
 var bikeDB = require("../util/bikeDB");
-var bikeDB = require("../util/tripDB");
-var receiptDB = require("../util/receiptDB");
+var tripDB = require("../util/tripDB");
+var receiptDB = require("../util/receiptsDB");
 
 var latitude;
 var longitude;
@@ -19,6 +19,7 @@ client.on("error", function (err) {
         console.log("Error " + err);
 });
 
+	
 
  exports.bikerLogin = function (req, res) {
 	if(!req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerPassword')) {
@@ -60,6 +61,18 @@ client.on("error", function (err) {
 		}
 	},json);
 }
+
+exports.hello = function(req,res,next){
+	if(true)
+		next();
+	else
+		res.render('hello');
+}
+
+exports.hi = function(req,res){
+	res.render('hello');
+}
+
 
 exports.signup = function (req, res) {
 	if(!req.body.hasOwnProperty('userEmail') || !req.body.hasOwnProperty('password') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('bikerAddress') ) {
@@ -129,7 +142,7 @@ exports.showSelectedBikeInfo = function(req,res){
 
 exports.extendExistingBooking = function(req, res){
 	if(!req.body.hasOwnProperty('tripId') || !req.body.hasOwnProperty('tripStatus')){
-		res.render('extend'.{json:});
+		res.render('extend',{'json':"kson"});
 	}
 	else{
 		res.render('error');

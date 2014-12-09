@@ -2,9 +2,10 @@
  * Author: Sai
  */
 
-var bikeDB = require("./util/bikeDB");
-var costMetricsDB = require("./util/costMetricsDB");
-var bikeStationDB = require("./util/bikeStationDB");
+var bikeDB = require("../util/bikeDB");
+var costMetricsDB = require("../util/costMetricsDB");
+var bikeStationDB = require("../util/bikeStationDB");
+
 var receipt = require("./util/receipt");
 
 var mongo = require("../util/MongoDBConnectionPool");

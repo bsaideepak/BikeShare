@@ -170,7 +170,7 @@ function findAllBikes(callback){
 	});
 }
 
-exports.removeBikeStation = removeBikeStation;
+exports.findAllBikes = findAllBikes;
 
 function findAllBikesByCurrentStationId(callback, bikeLocationName){
 
@@ -254,7 +254,7 @@ function findBikeById(callback, bikeId){
 		}
 	});
 }
-}
+
 exports.findBikeById = findBikeById;
 
 
