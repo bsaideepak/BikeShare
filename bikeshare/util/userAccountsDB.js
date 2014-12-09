@@ -2,80 +2,82 @@
  * Author: Sai
  */
 
-var MongoClient = require('mongodb').MongoClient;
+var mongo = require("../util/MongoDBConnectionPool");
+var dbc="j";
+var collectionName = "userAccounts"; 
 
 function newUser(json){
 	
-	if(json.userEmail && json.password{
+	if(json.bikerContactEmail && json.bikerPassword{
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
-			if(err){
-				console.log("Error: "+err);
-			}
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+	},collectionName);	
 		
-			else
-			{	
-				db.collection("userAccounts", function (err, connection){
-				
-					connection.insert({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
+		dbc.insert({'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerPassword, 'bikerName':json.bikerName,'bikerContactAddress':json.bikerContactAddress, 'bikerContactPhone':json.bikerContactPhone },function (err,result){
 					
-						if(err){
-							console.log(err);
-							db.close();
-						}
+			if(err){
+				console.log(err);
+				//db.close();
+			}
 					
-						else{
-							console.log("New User Created.");
-							db.close();
-						}
-					});
-				});
+			else{
+				console.log("New User Created.");
+				//db.close();
 			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
 exports.newUser = newUser;
 
 
-function changeUserPassword(json){
+function changeUserPassword(callback,json){
 	
-	if(json.userEmail && json.password){
+	if(json.usebikerContactEmailrEmail && json.bikerPassword){
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
 			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);	
 		
-			else
-			{	
-				db.collection("userAccounts", function (err, connection){
-				
-					connection.findAndModify({query: {'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress }, update: {$set: {'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress } },upsert: true},function (err,result){
+		var success = 0;
+
+		dbc.findAndModify({query: {'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerCurrentPassword, 'bikerName':json.bikerName,'bikerContactAddress':json.bikerContactAddress, 'bikerContactPhone':json.bikerContactPhone }, update: {$set: {'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerNewPassword, 'bikerContactName':json.bikerContactName,'bikerContactAddress':json.bikerContactAddress } },upsert: true},function (err,result){
 					
-						if(err){
-							console.log(err);
-							db.close();
-						}
+			if(err){
+				console.log(err);
+				//db.close();
+			}
 					
-						else{
-							console.log("User Password Updated.");
-							db.close();
-						}
-					});
-				});
+			else{
+				if(result!=null){
+					console.log("User Password Updated.");
+					callback(null,1);
+					//db.close();	
+				}
+				else{
+					callback(null, 0);
+				}
 			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -83,37 +85,33 @@ exports.changeUserPassword = changeUserPassword;
 
 function removeUser(json){
 	
-	if(json.userEmail && json.password){
+	if(json.bikerContactEmail && json.bikerCurrentPassword){
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
 			}
-		
-			else
-			{	
-				db.collection("userAccounts", function (err, connection){
+			else{
+				dbc = coll;
+			}
+		},collectionName);	
 				
-					connection.remove({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
+		dbc.remove({'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerPassword },function (err,result){
 					
-						if(err){
-							console.log(err);
-							db.close();
-						}
+			if(err){
+				console.log(err);
+				//db.close();
+			}
 					
-						else{
-							console.log("User Deleted.");
-							db.close();
-						}
-					});
-				});
+			else{
+				console.log("User Deleted.");
+				//db.close();
 			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -126,63 +124,59 @@ function userLogin(callback,json){
 
 		var authenticated;
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
 			}
-		
-			else
-			{	
-				db.collection("userAccounts", function (err, connection){
+			else{
+				dbc = coll;
+			}
+		},collectionName);	
 				
-					connection.find({'userEmail':json.userEmail,'password':json.password, 'bikerName':json.bikerName,'bikerAddress':json.bikerAddress },function (err,result){
+		dbc.find({'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerPassword },function (err,result){
 					
-						if(err){
-							authenticated = 0;
-							console.log(err);
-							db.close();
-						}
+			if(err){
+				authenticated = 0;
+				console.log(err);
+				//db.close();
+			}
 					
-						else{
+			else{
 							
-							var userEmail;
-							var password;
+				var bikerContactEmail;
+				var bikerPassword;
 							
-							result.toArray(function(err,docs){
+				result.toArray(function(err,docs){
 								
-								if(!docs.length==0)
-								{
-									//console.log(docs);
-									userEmail = docs[0].userEmail;
-									password = docs[0].password;
+					if(!docs.length==0)
+					{
+						//console.log(docs);
+						bikerContactEmail = docs[0].bikerContactEmail;
+						bikerPassword = docs[0].bikerPassword;
 
-									if(json.userEmail==userEmail && json.password == password)
-									{
-										authenticated = 1;
-										console.log("User Authenticated");
-										callback(err,authenticated);
-									}
-									else
-									{
-										authenticated = 0;
-										console.log("User Not Authenticated");
-										callback(err,authenticated);
-									}
-								}
-								else{
-									console.log("ERROR.");
-								}
-							});
+						if(json.bikerContactEmail==bikerContactEmail && json.bikerPassword == bikerPassword)
+						{
+							authenticated = 1;
+							console.log("User Authenticated");
+							callback(err,authenticated);
 						}
-					});
+						else
+						{
+							authenticated = 0;
+							console.log("User Not Authenticated");
+							callback(err,authenticated);
+						}
+					}
+					else{
+						console.log("ERROR.");
+					}
 				});
 			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 

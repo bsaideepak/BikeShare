@@ -2,41 +2,41 @@
  * Author: Sai
  */
 
-var MongoClient = require('mongodb').MongoClient;
+var mongo = require("../util/MongoDBConnectionPool");
+var dbc="j";
+var collectionName = "bike";
 
-function insertBike(json){
+function insertBike(callback,json){
 	
-	if(json.bikeId && json.bikeId && json.bikeName && json.currentStationId){
+	if(json.bikeId && json.bikeName){
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
 			}
-		
-			else
-			{	
-				//var d = new Date();
-				//var timeStamp = d.getTime();
-		
-				//json.orderId = json.firstname + timeStamp + json.lastname; 
-				db.collection("bike", function (err, connection){
-				
-					connection.insert({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime,'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority, 'currentStationId':json.currentStationId},function (err,result){
-					
-						if(err){
-							console.log(err);
-							db.close();
-						}
-					
-						else{
-							console.log("Operation Successful.");
-							db.close();
-						}
-					});
-				});
+			else{
+				dbc = coll;
 			}
-		});
+		},collectionName);
+
+		dbc.insert({'bikeId':json.bikeId,'bikeName':json.bikeName, 'bikeCurrentLatitide': json.bikeCurrentLatitude, 'bikeCurrentLongitude': json.bikeCurrentLongitude, 'bikeCategoryScale':json.bikeCategoryScale, 'bikeAdvancedBookingFlag': json.bikeAdvancedBookingFlag, 'bikeInsuranceScale':json.bikeInsuranceScale, 'bikeMaintainanceScale':json.bikeMaintainanceScale, 'bikeLocationPremiumScale': json.bikeLocationPremiumScale, 'bikeOwnerContact': json.bikeOwnerContact, 'bikeOwnerName': json.bikeOwnerName, 'bikeInUseFlag': json.bikeInUseFlag},function (err,result){
+					
+			if(err){
+				console.log(err);
+				callback(err,null);
+				//db.close();
+			}
+					
+			else{
+				var status = 1;
+				console.log("Operation Successful.");
+				callback(null,status);
+				//db.close();
+			}
+		}); 
+	}
+	else{
+		console.log("Incomplete Data.");
 	}
 }
 
@@ -45,77 +45,101 @@ exports.insertBike = insertBike;
 
 function updateBikeInfo(json){
 
-	if(json.bikeId && json.bikeId && json.bikeName){
+	if(json.bikeId && json.bikeName){
 
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
-				db.close();
 			}
-
-			else
-			{	
-				db.collection("bike", function (err, connection){
-
-					cconnection.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime, 'currentStationId':json.currentStationId } }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
+			else{
+				dbc = coll;
 			}
+		},collectionName);
+				
+		dbc.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'bikeCurrentLatitide':json.bikeCurrentLatitide,'bikeCurrentLongitude':json.bikeCurrentLongitude, 'bikeAdvancedBookingFlag':json.bikeAdvancedBookingFlag, 'bikeLocationName': json.bikeLocationName } }, upsert: true },function(err,result){
 
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
+			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
 exports.updateBikeInfo = updateBikeInfo;	
 
+function updateBikeInUseFlag(json){
 
-function removeBike(json){
+	if(json.bikeId){
 
-	if(json.bikeId && json.bikeId && json.bikeName){
-
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
-				db.close();
 			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);
+				
+		dbc.findAndModify({query: {"bikeId": json.bikeId },update: { $set: { 'bikeCurrentLatitide':json.bikeCurrentLatitide,'bikeCurrentLongitude':json.bikeCurrentLongitude, 'bikeInUseFlag': json.bikeInUseFlag} }, upsert: true },function(err,result){
 
-			else
-			{
-				db.collection("bike", function (err, connection){
-
-					connection.remove({'bikeId':json.bikeId,'bikeName':json.bikeName,'availableStartTime':json.availableStartTime,'availableEndTime':json.availableEndTime, 'categoryPriority':json.categoryPriority, 'insurancePriority':json.insurancePriority,'currentStationId':json.currentStationId},function (err,result){
-						
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Removed");
-							db.close();
-						}
-					});
-				});
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
 			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
+	}
+}
+
+exports.updateBikeInUseFlag = updateBikeInUseFlag;	
+
+
+
+function removeBike(json){
+
+	if(json.bikeId && json.bikeName){
+
+		mongo.getConnection(function(err,coll){
+			if(err){
+				console.log("Error: "+err);
+			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);
+
+		dbc.remove({'bikeId':json.bikeId},function (err,result){
+						
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Removed");
+				//db.close();
+			}
+		});
+				
+	}
+	else{
+		console.log("Insufficient Data.");
+		//db.close();
 	}
 }
 
@@ -123,120 +147,218 @@ exports.removeBike = removeBike;
 
 function findAllBikes(callback){
 
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+	mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
+					
+	dbc.find(function(err,result){
 
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("No order exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
 		}
-		else
-		{
-			db.collection("bike", function (err, connection){
-
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find(function(err,result){
-
-						if(err){
-							console.log("No order exists.");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							callback(err,result);
-							db.close();
-						}
-					});
-				}
-
-			});
+		else{
+			callback(err,result);
+			//db.close();
 		}
 	});
 }
+
 exports.removeBikeStation = removeBikeStation;
 
-function findAllBikesByCurrentStationId(callback, currentStationId){
+function findAllBikesByCurrentStationId(callback, bikeLocationName){
 
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+	mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
+	
+	dbc.find({'bikeLocationName':bikeLocationName},function(err,result){
 
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("No order exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
 		}
-		else
-		{
-			db.collection("bike", function (err, connection){
-
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'currentStationId':currentStationId},function(err,result){
-
-						if(err){
-							console.log("No order exists.");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							callback(err,result);
-							db.close();
-						}
-					});
-				}
-
-			});
+		else{
+			callback(err,result);
+			//db.close();
 		}
 	});
 }
+
+
 exports.findAllBikesByCurrentStationId = findAllBikesByCurrentStationId;
 
 
-function findBikeById(callback, bikeId){
+function findAllBikesNotInUse(callback){
 
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+	mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
+	
+	dbc.find({'bikeInUseFlag': 0},function(err,result){
 
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("No order exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
 		}
-		else
-		{
-			db.collection("bike", function (err, connection){
-
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'bikeId':bikeId},function(err,result){
-
-						if(err){
-							console.log("No bike exists.");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							callback(err,result);
-							db.close();
-						}
-					});
-				}
-
-			});
+		else{
+			callback(err,result);
+			//db.close();
 		}
 	});
 }
+
+
+exports.findAllBikesByCurrentStationId = findAllBikesByCurrentStationId;
+
+function findBikeById(callback, bikeId){
+
+	mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
+					
+	dbc.find({'bikeId':bikeId},function(err,result){
+
+		if(err){
+			console.log("No bike exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		
+		else{
+			callback(err,result);
+			//db.close();
+		}
+	});
+}
+}
 exports.findBikeById = findBikeById;
+
+
+function updateCategoryPriority(json){
+
+	if(json.categoryPriority && json.percentage)
+	{
+		mongo.getConnection(function(err,coll){
+			if(err){
+				console.log("Error: "+err);
+			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);
+		
+		dbc.findAndModify({query: {'bikeId':json.bikeId },update: { $set: { "bikeCategoryScale": json.bikeCategoryScale,"percentage": json.percentage } }, upsert: true },function(err,result){
+
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
+			}
+		});
+	}
+	else{
+		console.log("Insufficient Data.");
+		//db.close();
+	}
+}
+
+exports.updateCategoryPriority = updateCategoryPriority;
+
+
+function updateInsurancePriority(json){
+
+	if(json.insurancePriority && json.percentage)
+	{
+		mongo.getConnection(function(err,coll){
+			if(err){
+				console.log("Error: "+err);
+			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);
+		
+		dbc.findAndModify({query: {'bikeId':json.bikeId },update: { $set: { "bikeInsuranceScale": json.bikeInsuranceScale ,"percentage": json.percentage } }, upsert: true },function(err,result){
+
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
+			}
+		});
+	}
+	else{
+		console.log("Insufficient Data.");
+		//db.close();
+	}
+}
+
+exports.updateInsurancePriority = updateInsurancePriority;
+
+
+
+function updateLocationPriority(json){
+
+	if(json.locationPriority && json.percentage)
+	{
+		mongo.getConnection(function(err,coll){
+			if(err){
+				console.log("Error: "+err);
+			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);
+
+		dbc.findAndModify({query: {'bikeId':json.bikeId },update: { $set: { "bikeLocationPremiumScale": json.bikeLocationPremiumScale,"percentage": json.percentage } }, upsert: true },function(err,result){
+
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
+			}
+		});
+	}
+	else{
+		console.log("Insufficient Data.");
+		//db.close();
+	}
+}
+
+exports.updateLocationPriority = updateLocationPriority;
+
 
 

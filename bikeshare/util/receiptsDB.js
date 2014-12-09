@@ -2,113 +2,71 @@
  * Author: Sai
  */
 
-var MongoClient = require('mongodb').MongoClient;
+var mongo = require("../util/MongoDBConnectionPool");
+var dbc="j";
+var collectionName = "receipts";
 
 function insertTransaction(json){
 	
-	if(json.tripId && json.totalHrsUsed && json.totalCost)
+	if(json.tripId)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
 			}
-			else
-			{ 
-				db.collection("receipts", function (err, connection){
-
-					connection.insert({'tripId':json.tripId,'totalHrsUsed':json.totalHrsUsed,'totalCost':json.totalCost,'totalMilesTravelled':json.totalMilesTravelled},function (err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							db.close();
-							console.log("Operation Successful.");
-						}
-					});
-				});
+			else{
+				dbc = coll;
 			}
+		},collectionName);
 
+		dbc.insert({'tripId':json.tripId,'tripTotalTime':json.tripTotalTime,'tripTotalCost':json.tripTotalCost,'tripCostPerHr':json.tripCostPerHr, 'receiptId':json.receiptId},function (err,result){
+
+			if(err){
+				console.log(err);
+				//db.close();
+			}
+		
+			else{
+				//db.close();
+				console.log("Operation Successful.");
+			}
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
 exports.insertTransaction = insertTransaction;
 
 
-function updateTransaction(json){
-
-	if(json.tripId && json.totalHrsUsed && json.totalCost)
-	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
-			if(err){
-				console.log("Error: "+err);
-				db.close();
-			}
-			else
-			{	
-				db.collection("receipts", function (err, connection){
-
-					cconnection.findAndModify({query: {'tripId': json.tripId },update: { $set: { 'totalHrsUsed':json.totalHrsUsed, 'totalCost':json.totalCost, 'totalMilesTravelled':json.totalMilesTravelled} }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
-			}
-
-		});
-	}
-	else{
-		console.log("Insufficient Data.");
-		db.close();
-	}
-}
-
-exports.updateTransaction = updateTransaction;	
-
-
 function removeTransaction(json){
 
-	if(json.tripId && json.totalHrsUsed && json.totalCost)
+	if(json.tripId)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-			
+		mongo.getConnection(function(err,coll){
 			if(err){
 				console.log("Error: "+err);
-				db.close();
 			}
-			else
-			{
-				db.collection("receipts", function (err, connection){
+			else{
+				dbc = coll;
+			}
+		},collectionName);
 
-					connection.remove({'tripId':json.tripId,'totalHrsUsed':json.totalHrsUsed,'totalCost':json.totalCost,'totalMilesTravelled':json.totalMilesTravelled},function (err,result){
+		dbc.remove({'tripId':json.tripId,'receiptId':json.receiptId},function (err,result){
 						
-						if(err){
-							console.log(err);
-							db.close();
-						}
+			if(err){
+				console.log(err);
+				//	db.close();
+			}
 
-						else{
-							console.log("Successfully Removed");
-							db.close();
-						}
-					});
-				});
+			else{
+				console.log("Successfully Removed");
+				//db.close();
 			}
 		});
+	
 	}
 	else{
 		console.log("Insufficient Data.");
@@ -120,76 +78,57 @@ exports.removeTransaction = removeTransaction;
 
 function findAllTransactions(callback){
 
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
 				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
 		}
-		else
-		{
-			db.collection("receipts", function (err, connection){
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find(function(err,result){
-						if(err){
-							console.log("No order exists.");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							db.close();
-							callback(err,result);
-						}
-					});
-				}
-
-			});
+		else{
+				dbc = coll;
+		}
+	},collectionName);
+					
+	dbc.find(function(err,result){
+						
+		if(err){
+			console.log("No order exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		
+		else{
+			//db.close();
+			callback(err,result);
 		}
 	});
 }
+
 exports.findAllTransactions = findAllTransactions;
 
 function findAllTransactionsByTripId(callback,tripId){
 
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("Error: "+err);
 		}
-		else
-		{
-			db.collection("receipts", function (err, connection){
-				
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({"tripId":tripId},function(err,result){
-						if(err){
-							console.log("No order exists.");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							db.close();
-							callback(err,result);
-						}
-					});
-				}
+		else{
+			dbc = coll;
+		}
+	},collectionName);				
 
-			});
+	dbc.find({"tripId":tripId},function(err,result){
+		
+		if(err){
+			console.log("No order exists.");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		
+		else{
+			//db.close();
+			callback(err,result);
 		}
 	});
 }
+
 exports.findAllTransactionsByTripId = findAllTransactionsByTripId;
 

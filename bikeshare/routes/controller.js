@@ -6,26 +6,34 @@
 var userAccountsDB = require("../util/userAccountsDB");
 var bikeStationDB = require("../util/bikeStationDB");
 var bikeDB = require("../util/bikeDB");
+var bikeDB = require("../util/tripDB");
 var receiptDB = require("../util/receiptDB");
 
 var latitude;
 var longitude;
 
- exports.userLogin = function (req, res) {
-	if(!req.body.hasOwnProperty('userEmail') || !req.body.hasOwnProperty('password')) {
+var redis = require("redis");
+var client = redis.createClient();
+
+client.on("error", function (err) {
+        console.log("Error " + err);
+});
+
+
+ exports.bikerLogin = function (req, res) {
+	if(!req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerPassword')) {
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 	var json = [];
-	json.userEmail = req.body.userEmail;
-	json.password = req.body.password;
+	json.bikerContactEmail = req.body.bikerContactEmail;
+	json.bikerPassword = req.body.bikerPassword;
 
 	req.session.latitude = req.body.latitude;
 	req.session.longitude = req.body.longitude;
 
-	latitude = req.session.latitude;
-	longitude = req.session.longitude;
-
+	//latitude = req.session.latitude;
+	//longitude = req.session.longitude;
 	
 	userAccountsDB.userLogin(function(err,results){
 		if(err){
@@ -35,8 +43,9 @@ var longitude;
 		{
 			if(results==1){
 
-				req.session.userEmail = req.body.userEmail;
-				console.log(req.session.userEmail);
+				client.setex(req.body.bikerContactEmail, 900, req.body.bikerContactEmail, function (err, reply) {     //REDIS Set.
+       				console.log(reply.toString());
+    			});
 
 				//res.render('../views/bikeStations.ejs');
 				console.log("success");
@@ -58,10 +67,11 @@ exports.signup = function (req, res) {
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 	var json = [];
-	json.userEmail = req.body.userEmail;
-	json.password = req.body.password;
+	json.bikerContactEmail = req.body.bikerContactEmail;
+	json.bikerPassword = req.body.bikerPassword;
 	json.bikerName = req.body.bikerName;
-	json.bikerAddress = req.body.bikerAddress;
+	json.bikerContactAddress = req.body.bikerContactAddress;
+	json.bikerContactPhone = req.body.bikerContactPhone;
 
 	userAccountsDB.newUser(json);
 
@@ -70,109 +80,246 @@ exports.signup = function (req, res) {
 
 
 exports.checkSessionExists = function(req, res, next) {
-	if(req.session.userEmail){
-		next();
+	client.get(bikerContactEmail, function(err,bikerDetails){
+		if(bikerDetails != null){
+			next();
+		}
+		else{
+			return res.render('../views/sessionExpired.ejs');
+		}
+	});
+}
+
+exports.showSelectionPage = function(req,res){
+	res.render('select');
+}
+
+//In showMapsPlot, the booking times of bikes need to be considered. Re-Write the function findAllBikesNotInUse.
+
+exports.showMapsPlot = function(req,res){
+	bikeDB.findAllBikesNotInUse(function(err,result){
+		if(!err){
+			res.render('showMapsPlot',{'json':result.toArray()});
+		}
+		else{
+			res.render('error');
+		}
+	});
+}
+
+exports.showSelectedBikeInfo = function(req,res){
+	if(req.params.bikeId){
+
+		bikeDB.findBikeById(function(err,result){
+			if(!err){
+				res.render('bike_info',{'json':result.toArray()});
+			}
+			else{
+				res.render('error');
+			}
+
+		},bikeId);
 	}
 	else{
-		return res.render('../views/sessionExpired.ejs');
+		res.render('error');
 	}
 }
 
-exports.showAvailableBikeStations = function(req, res) {
+//Incomplete Extend Booking Feature.
 
-	if(!req.body.hasOwnProperty('latitude') || !req.body.hasOwnProperty('longitude')) {
-		res.statusCode = 400;
-		return res.send('Error 400: Post syntax incorrect.');
+exports.extendExistingBooking = function(req, res){
+	if(!req.body.hasOwnProperty('tripId') || !req.body.hasOwnProperty('tripStatus')){
+		res.render('extend'.{json:});
 	}
-
-	var json = [];
-	//json.latitude = req.body.latitude;
-	//json.longitude = req.body.longitude;
-
-	bikeStationDB.findAllBikeStations(function(err,results){
-		if(err){
-			console.log(err);
-		}
-		else
-		{
-			//res.render('../views/ResponsiveGoogleMap.ejs');
-		}
-	}/*,json*/);
-}
-
-exports.getBikeDetails = function(req, res) {
-
-	if(!req.body.hasOwnProperty('latitude') || !req.body.hasOwnProperty('longitude') || !req.body.hasOwnProperty('currentStationId')) {
-		res.statusCode = 400;
-		return res.send('Error 400: Post syntax incorrect.');
+	else{
+		res.render('error');
 	}
-
-	var json = [];
-	//json.latitude = req.body.latitude;
-	//json.longitude = req.body.longitude;
-
-	bikeDB.findAllBikesByCurrentStationId(function(err,results){
-		if(err){
-			console.log(err);
-		}
-		else
-		{
-			//res.render('../views/showAvailableBikes.ejs');
-		}
-	}, req.body.currentStationId);
 }
-
 
 exports.tripConfirmation = function(req, res) {
 
-	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bikeName') || !req.body.hasOwnProperty('availableUpto') || !req.body.hasOwnProperty('bookingStartTime') || !req.body.hasOwnProperty('bookingEndTime') || !req.body.hasOwnProperty('costPerHr') || !req.body.hasOwnProperty('currentStationId') ) {
+	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bookingStartTimeHours') || !req.body.hasOwnProperty('bookingStartTimeMinutes') || !req.body.hasOwnProperty('bookingEndTimeHours') || !req.body.hasOwnProperty('bookingEndTimeMinutes') || !req.body.hasOwnProperty('pickUpPoint') || !req.body.hasOwnProperty('dropOffPoint') || !req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerContactPhone') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('tripStatus') ) {
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 
 	var json = [];
 	json.bikeId = req.body.bikeId;
-	json.bikeName = req.body.bikeName;
-	json.availableUpto = req.body.availableUpto;
-	json.bookingStartTime = req.body.bookingStartTime;
-	json.bookingEndTime = req.body.bookingEndTime;
-	json.costPerHr = req.body.costPerHr;
-	json.currentStationId = req.body.currentStationId;
-
-	bikeStationDB.findAllBikeStationsWhereEmptySlotsExist(function(err,result){
+	json.bikerName = req.body.bikerName;
+	json.bikerContactEmail = req.body.bikerContactEmail;
+	json.bikerContactPhone = req.body.bikerContactPhone;
+	json.pickUpPoint= req.body.pickUpPoint;
+	json.dropOffPoint= req.body.dropOffPoint;
+	json.tripStatus = req.body.tripStatus;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	
+	tripDB.insertTrip(function(err,result){
 
 		if(!err){
-			//res.render('../views/showAvailableDropOffPoints.ejs');
-			//res.send(result);
+			res.render('../views/tripConfirmation.ejs',{'json': json});
+		}
+		else{
+			res.render('error');
 		}
 
-	});
+	},json);
 }
 
 
-exports.generateReceipt = function(req, res) {
+exports.changePassword = function(req, res){
 
-	if(!req.body.hasOwnProperty('dropOffPoint') ) {
+	var json = [];
+
+	if(!req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerCurrentPassword') || !req.body.hasOwnProperty('bikerNewPassword')  || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('bikerContactAddress') || !req.body.hasOwnProperty('bikerContactPhone')){
+
+		json.bikerName = req.body.bikerName;
+		json.bikerContactEmail = req.body.bikerContactEmail;
+		json.bikerContactPhone = req.body.bikerContactPhone;
+		json.bikerContactAddress = req.body.bikerContactAddress;
+		json.bikerCurrentPassword = req.body.bikerCurrentPassword;
+		json.bikerNewPassword = req.body.bikerNewPassword;
+
+		userAccountsDB.changePassword(function(err,result){
+			if(!err){
+				if(result == 1){
+					res.render('passwordChanged');
+				}
+				else{
+					res.render('error');
+				}
+			}
+		},json);
+	}
+	else{
+		res.render(error);
+	}
+
+}
+
+exports.addNewBike = function(req,res){
+
+	var json = [];
+
+	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bikeName') || !req.body.hasOwnProperty('bikeCurrentLatitide')  || !req.body.hasOwnProperty('bikeCurrentLongitude') || !req.body.hasOwnProperty('bikeCategoryScale') || !req.body.hasOwnProperty('bikeAdvancedBookingFlag') || !req.body.hasOwnProperty('bikeInsuranceScale') || !req.body.hasOwnProperty('bikeMaintainanceScale') || !req.body.hasOwnProperty('bikeOwnerContact')  || !req.body.hasOwnProperty('bikeLocationPremiumScale') || !req.body.hasOwnProperty('bikeOwnerName') || !req.body.hasOwnProperty('bikeAdvancedBookingFlag')){
+
+		json.bikeId = req.body.bikeId;
+		json.bikeName = req.body.bikeName;
+		json.bikeCurrentLatitide = req.body.bikeCurrentLatitide;
+		json.bikeCurrentLongitude = req.body.bikeCurrentLongitude;
+		json.bikeCategoryScale = req.body.bikeCategoryScale;
+		json.bikeAdvancedBookingFlag = req.body.bikeAdvancedBookingFlag;
+		json.bikeInsuranceScale = req.body.bikeInsuranceScale;
+		json.bikeMaintainanceScale = req.body.bikeMaintainanceScale;
+		json.bikeLocationPremiumScale = req.body.bikeLocationPremiumScale;
+		json.bikeOwnerContact = req.body.bikeOwnerContact;
+		json.bikeOwnerName = req.body.bikeOwnerName;
+		json.bikeInUseFlag = req.body.bikeInUseFlag;
+
+		bikeDB.insertBike(function(err,result){
+			if(!err){
+				res.render('added_new_bike',{'json':json});
+			}
+			else{
+				res.render('error_adding_bike',{'json':json});
+			}
+		},json)
+	}
+	else{
+		res.render('error');
+	}	
+}
+
+exports.reportDammage = function(req,res){
+
+	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bookingStartTimeHours') || !req.body.hasOwnProperty('bookingStartTimeMinutes') || !req.body.hasOwnProperty('bookingEndTimeHours') || !req.body.hasOwnProperty('bookingEndTimeMinutes') || !req.body.hasOwnProperty('pickUpPoint') || !req.body.hasOwnProperty('dropOffPoint') || !req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerContactPhone') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('tripStatus') || !req.body.hasOwnProperty('bikeMaintainanceScale') ) {
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 
 	var json = [];
-	json.bikeId = req.session.bikeId;
-	json.bikeName =  req.session.bikeName;
-	json.availableUpto = req.session.availableUpto;   //check the need.
-	json.bookingStartTime =  req.session.bookingStartTime;
-	json.bookingEndTime = req.session.bookingEndTime;
-	json.costPerHr = req.session.costPerHr;
-	json.pickUpPoint = req.session.currentStationId;
-	json.dropOffPoint = req.body.dropOffPoint;
+	json.bikeId = req.body.bikeId;
+	json.bikerName = req.body.bikerName;
+	json.bikerContactEmail = req.body.bikerContactEmail;
+	json.bikerContactPhone = req.body.bikerContactPhone;
+	json.pickUpPoint= req.body.pickUpPoint;
+	json.dropOffPoint= req.body.dropOffPoint;
+	json.tripStatus = req.body.tripStatus;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	json.bikeMaintainanceScale = req.body.bikeMaintainanceScale;	
 
-	receipt.insertTransaction(function(err,result){
-
+	tripDB.insertTrip(function(err,result){
 		if(!err){
-			//res.render('../views/acknowledgement.ejs');
-		}
+			console.log("Dammage Reported.");
 
-	},json);
+			bikeDB.findAllBikesNotInUse(function(err,results){
+				if(!err){
+					res.render('showMapsPlot',{'json':results.toArray()});
+				}
+				else{
+					res.render('error');
+				}
+			});
+		}
+		else{
+			console.log("Error: "+err);
+		}
+	});
+}
+
+exports.returnBike = function(req,res){
+	if(!req.body.hasOwnProperty('bikeId') || !req.body.hasOwnProperty('bookingStartTimeHours') || !req.body.hasOwnProperty('bookingStartTimeMinutes') || !req.body.hasOwnProperty('bookingEndTimeHours') || !req.body.hasOwnProperty('bookingEndTimeMinutes') || !req.body.hasOwnProperty('pickUpPoint') || !req.body.hasOwnProperty('dropOffPoint') || !req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerContactPhone') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('tripStatus') || !req.body.hasOwnProperty('bikeMaintainanceScale') ) {
+		res.statusCode = 400;
+		return res.send('Error 400: Post syntax incorrect.');
+	}
+
+	var json = [];
+	json.bikeId = req.body.bikeId;
+	json.bikerName = req.body.bikerName;
+	json.bikerContactEmail = req.body.bikerContactEmail;
+	json.bikerContactPhone = req.body.bikerContactPhone;
+	json.pickUpPoint= req.body.pickUpPoint;
+	json.dropOffPoint= req.body.dropOffPoint;
+	json.tripStatus = req.body.tripStatus;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	json.bookingStartTimeHours = req.body.bookingStartTimeHours;
+	json.bookingEndTimeMinutes = req.body.bookingEndTimeMinutes;
+	json.bikeMaintainanceScale = req.body.bikeMaintainanceScale;	
+
+	tripDB.updateTripStatus(json);
+}
+
+
+exports.viewAllMyRides = function(req,res){
+	tripDB.findTripByBikerContactEmail(function(err,result){
+		res.render('view_all_my_bike_rides',{'json':result.toArray()});
+	});
+}
+
+exports.adminFunctions = function(req,res){
+	res.render('priorityScales');
+}
+
+exports.adminFunctionsConfirmation = function(req,res){
+	if(!req.body.hasOwnProperty('bikeLocationPremiumScale') || !req.body.hasOwnProperty('bikeInsuranceScale') || !req.body.hasOwnProperty('bikeCategoryScale')){
+
+		var json = [];
+		json.bikeId = req.body.bikeId;
+		json.bikeLocationPremiumScale = req.body.bikeLocationPremiumScale;
+		json.bikeInsuranceScale = req.body.bikeInsuranceScale;
+		json.bikeCategoryScale = req.body.bikeCategoryScale;
+		bikeDB.updateCategoryPriority(json);
+		bikeDB.updateInsurancePriority(json);
+		bikeDB.updateLocationPriority(json);
+	}
+	else{
+		console.log("Insufficient Data.");
+	}
 }
 

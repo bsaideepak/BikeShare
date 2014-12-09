@@ -2,39 +2,39 @@
  * Author: Sai
  */
 
-var MongoClient = require('mongodb').MongoClient;
+var mongo = require("../util/MongoDBConnectionPool");
+var dbc="j";
+var collectionName = "CostMetrics";
 
 function insertCategoryPriority(json){
 	
 	if(json.categoryPriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+
+		dbc.insert({'categoryPriority':json.categoryPriority,'percentage':json.percentage},function (err,result){
+
 			if(err){
-				console.log("Error: "+err);
+				console.log(err);
+				//db.close();
 			}
-			else
-			{ 
-				db.collection("CostMetrics", function (err, connection){
-
-					connection.insert({'categoryPriority':json.categoryPriority,'percentage':json.percentage},function (err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							db.close();
-							console.log("Operation Successful.");
-						}
-					});
-				});
+			else{
+				//db.close();
+				console.log("Operation Successful.");
 			}
-
 		});
+
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -45,33 +45,31 @@ function insertLocationPriority(json){
 	
 	if(json.locationPriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.insert({'locationPriority':json.locationPriority,'percentage':json.percentage},function (err,result){
+
 			if(err){
-				console.log("Error: "+err);
+				console.log(err);
+				//db.close();
 			}
-			else
-			{ 
-				db.collection("CostMetrics", function (err, connection){
-
-					connection.insert({'locationPriority':json.locationPriority,'percentage':json.percentage},function (err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							db.close();
-							console.log("Operation Successful.");
-						}
-					});
-				});
+			else{
+				//db.close();
+				console.log("Operation Successful.");
 			}
-
 		});
+				
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -82,35 +80,33 @@ function insertInsurancePriority(json){
 	
 	if(json.insurancePriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.insert({'insurancePriority':json.categoryPriority,'percentage':json.percentage},function (err,result){
+
 			if(err){
-				console.log("Error: "+err);
+				console.log(err);
+				//db.close();
 			}
-			else
-			{ 
-				db.collection("CostMetrics", function (err, connection){
-
-					connection.insert({'insurancePriority':json.categoryPriority,'percentage':json.percentage},function (err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							var status = "Successfully Inserted";
+			
+			else{
+				var status = "Successfully Inserted";
 							
-							db.close();
-							console.log("Operation Successful.");
-						}
-					});
-				});
+				//db.close();
+				console.log("Operation Successful.");
 			}
-
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -121,74 +117,69 @@ function insertTimePriority(json){
 	
 	if(json.bookingStartTime && json.bookingEndTime && json.bookingDay && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.insert({'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime,'bookingDay':json.bookingDay,'percentage':json.percentage},function (err,result){
+
 			if(err){
-				console.log("Error: "+err);
+				console.log(err);
+				//db.close();
 			}
-			else
-			{ 
-				db.collection("CostMetrics", function (err, connection){
-
-					connection.insert({'bookingStartTime':json.bookingStartTime,'bookingEndTime':json.bookingEndTime,'bookingDay':json.bookingDay,'percentage':json.percentage},function (err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							var status = "Successfully Inserted";
+			
+			else{
+				var status = "Successfully Inserted";
 							
-							db.close();
-							console.log("Operation Successful.");
-						}
-					});
-				});
+				//db.close();
+				console.log("Operation Successful.");
 			}
-
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
 exports.insertTimePriority = insertTimePriority;
 
 
-
 function updateCategoryPriority(json){
 
 	if(json.categoryPriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.findAndModify({query: {"categoryPriority": json.categoryPriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
+
 			if(err){
-				console.log("Error: "+err);
-				db.close();
+				console.log(err);
+				//db.close();
 			}
-			else
-			{	
-				db.collection("CostMetrics", function (err, connection){
-
-					cconnection.findAndModify({query: {"categoryPriority": json.categoryPriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
+			
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
 			}
-
+		
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -199,34 +190,32 @@ function updateInsurancePriority(json){
 
 	if(json.insurancePriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.findAndModify({query: {"insurancePriority": json.insurancePriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
+
 			if(err){
-				console.log("Error: "+err);
-				db.close();
+				console.log(err);
+				//db.close();
 			}
-			else
-			{	
-				db.collection("CostMetrics", function (err, connection){
-
-					cconnection.findAndModify({query: {"insurancePriority": json.insurancePriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
+			
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
 			}
-
 		});
+				
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -238,34 +227,31 @@ function updateLocationPriority(json){
 
 	if(json.locationPriority && json.percentage)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+		
+		dbc.findAndModify({query: {"locationPriority": json.locationPriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
+
 			if(err){
-				console.log("Error: "+err);
-				db.close();
+				console.log(err);
+				//db.close();
 			}
-			else
-			{	
-				db.collection("CostMetrics", function (err, connection){
-
-					cconnection.findAndModify({query: {"locationPriority": json.locationPriority },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
+			
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
 			}
-
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -276,34 +262,30 @@ function updateTimePriority(json){
 
 	if(json.bookingDay && json.bookingEndTime && json.bookingStartTime)
 	{
-		MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
+		mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+		}
+		else{
+			dbc = coll;
+		}
+		},collectionName);
+
+		dbc.findAndModify({query: {"bookingDay": json.bookingDay, "bookingEndTime": json.bookingEndTime, "bookingStartTime": json.bookingStartTime },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
+
 			if(err){
-				console.log("Error: "+err);
-				db.close();
+				console.log(err);
+				//db.close();
 			}
-			else
-			{	
-				db.collection("CostMetrics", function (err, connection){
-
-					cconnection.findAndModify({query: {"bookingDay": json.bookingDay, "bookingEndTime": json.bookingEndTime, "bookingStartTime": json.bookingStartTime },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
-
-						if(err){
-							console.log(err);
-							db.close();
-						}
-						else{
-							console.log("Successfully Updated.");
-							db.close();
-						}
-					});
-				});
+			else{
+				console.log("Successfully Updated.");
+				//db.close();
 			}
-
 		});
 	}
 	else{
 		console.log("Insufficient Data.");
-		db.close();
+		//db.close();
 	}
 }
 
@@ -313,183 +295,142 @@ exports.updateTimePriority = updateTimePriority;
 function getLocationPriorityPercentage(callback,locationPriority){
 
 	var percentage;
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("Error: "+err);
 		}
-		else
-		{
-			db.collection("CostMetrics", function (err, connection){
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'locationPriority': locationPriority }, function(err,result){
-						if(err){
-							console.log("");
-							db.close();
-							callback(err,new Error("Error: "+ err));						}
-						else{
-							result.toArray(function(err,docs){
-								if(!docs.length == 0){
-									percentage = docs[0].percentage;
-									callback(err,percentage);
-								}
-								db.close();
-							})
-							
-							
-						}
-					});
-				}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
 
+	dbc.find({'locationPriority': locationPriority }, function(err,result){
+		
+		if(err){
+			console.log("");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		
+		else{
+			result.toArray(function(err,docs){
+				
+				if(!docs.length == 0){
+					percentage = docs[0].percentage;
+					callback(err,percentage);
+				}
+				//db.close();
 			});
 		}
 	});
 }
+
 exports.getLocationPriorityPercentage = getLocationPriorityPercentage;
 
 
 function getCategoryPriorityPercentage(callback,categoryPriority){
 
 	var percentage;
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("Error: "+err);
 		}
-		else
-		{
-			db.collection("CostMetrics", function (err, connection){
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'categoryPriority': categoryPriority }, function(err,result){
-						if(err){
-							console.log("");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							result.toArray(function(err,docs){
-								if(!docs.length == 0){
-									percentage = docs[0].percentage;
-									callback(err,percentage);
-								}
-								db.close();
-							})
-							
-							
-						}
-					});
-				}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
 
+	dbc.find({'categoryPriority': categoryPriority }, function(err,result){
+		
+		if(err){
+			console.log("");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		
+		else{
+			result.toArray(function(err,docs){
+				
+				if(!docs.length == 0){
+					percentage = docs[0].percentage;
+					callback(err,percentage);
+				}
+				//db.close();
 			});
 		}
 	});
 }
+
 exports.getCategoryPriorityPercentage = getCategoryPriorityPercentage;
 
 
 function getInsurancePriorityPercentage(callback,insurancePriority){
 
 	var percentage;
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("Error: "+err);
 		}
-		else
-		{
-			db.collection("CostMetrics", function (err, connection){
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'insurancePriority': insurancePriority }, function(err,result){
-						if(err){
-							console.log("");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							result.toArray(function(err,docs){
-								if(!docs.length == 0){
-									percentage = docs[0].percentage;
-									callback(err,percentage);
-								}
-								db.close();
-							})
-							
-							
-						}
-					});
-				}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
 
-			});
+	dbc.find({'insurancePriority': insurancePriority }, function(err,result){
+		
+		if(err){
+			console.log("");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		else{
+			result.toArray(function(err,docs){
+				
+				if(!docs.length == 0){
+					
+					percentage = docs[0].percentage;
+					callback(err,percentage);
+				}
+					//db.close();
+			});			
 		}
 	});
 }
+
 exports.getInsurancePriorityPercentage = getInsurancePriorityPercentage;
 
 
 function getTimePriorityPercentage(callback,json){
 
 	var percentage;
-	MongoClient.connect('mongodb://127.0.0.1:27017/bikeShare123', function(err, db) {
-
+	mongo.getConnection(function(err,coll){
 		if(err){
-				console.log("Error: "+err);
-				db.close();
-				callback(err,new Error("Error: "+ err));
+			console.log("Error: "+err);
 		}
-		else
-		{
-			db.collection("CostMetrics", function (err, connection){
-				if(err){
-					console.log("No such database exists.");
-					db.close();
-					callback(err,new Error("Error: "+ err));
-				}
-				else{
-					connection.find({'bookingStartTime': json.bookingStartTime, 'bookingEndTime': json.bookingEndTime, 'bookingDay': json.bookingDay  }, function(err,result){
-						if(err){
-							console.log("");
-							db.close();
-							callback(err,new Error("Error: "+ err));
-						}
-						else{
-							result.toArray(function(err,docs){
-								if(!docs.length == 0){
-									percentage = docs[0].percentage;
-									callback(err,percentage);
-								}
-								db.close();
-							})
-							
-							
-						}
-					});
-				}
+		else{
+			dbc = coll;
+		}
+	},collectionName);
 
+	dbc.find({'bookingStartTime': json.bookingStartTime, 'bookingEndTime': json.bookingEndTime, 'bookingDay': json.bookingDay  }, function(err,result){
+		
+		if(err){
+			console.log("");
+			//db.close();
+			callback(err,new Error("Error: "+ err));
+		}
+		else{
+			result.toArray(function(err,docs){
+				if(!docs.length == 0){
+					percentage = docs[0].percentage;
+					callback(err,percentage);
+				}
+				//db.close();
 			});
 		}
 	});
 }
+
 exports.getTimePriorityPercentage = getTimePriorityPercentage;
 
 

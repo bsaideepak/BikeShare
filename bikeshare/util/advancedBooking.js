@@ -9,17 +9,11 @@ var receipt = require("./util/receipt");
 
 var mongo = require("../util/MongoDBConnectionPool");
 var dbc="j";
-var collectionName = "trip";
+var collectionName = "advancedBookingDB";
 
-function insertTrip(callback,json){
-
-	var d = new Date();
-	var timeStamp = d.getTime();
-		
-	json.tripId = json.bikeId + timeStamp;
-
-
-	if(json.tripId && json.bookingStartTimeHours && json.bookingStartTimeMinutes && json.bookingEndTimeHours && json.bookingEndMinutes && json.pickUpPoint && json.dropOffPoint && json.bikerContactEmail && json.bikerContactPhone && json.bikeId && json.tripStatus && json.bikerName && json.bikeMaintainanceScale)
+function insertAdvancedTrip(callback,json){
+	
+	if(json.tripId && json.bookingStartTimeHours && json.bookingStartTimeMinutes && json.bookingEndTimeHours && json.bookingEndMinutes && json.bookingDay && json.pickUpPoint && json.dropOffPoint && json.bikerContactEmail && json.bikerContactPhone && json.bikerContactAddress && json.bikeId && json.bikeName && json.tripStatus)
 	{
 		mongo.getConnection(function(err,coll){
 			if(err){
@@ -28,7 +22,12 @@ function insertTrip(callback,json){
 			else{
 				dbc = coll;
 			}
-		},collectionName);
+		},collectionName);	
+
+		var d = new Date();
+		var timeStamp = d.getTime();
+		
+		json.tripId = json.bikeId + timeStamp + json.totalHrsUsed; 
 
 		var bikeCosts;
 		var costOverheads = [];
@@ -52,14 +51,14 @@ function insertTrip(callback,json){
 
 		costMetricsDB.getCostPerHr(function(err,cost){
 			if(!err){
-				json.tripCostPerHr = cost;
+				json.costPerHr = cost;
 			}
 			else{
 				console.log(err);
 			}
 		}costOverheads);
 
-		dbc.insert({'tripId':json.tripId, 'bookingStartTimeHours':json.bookingStartTimeHours,'bookingStartTimeMinutes':json.bookingStartTimeMinutes,'bookingEndTimeHours':json.bookingEndTimeHours ,'bookingEndTimeMinutes':json.bookingEndTimeMinutes , 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'bikerContactEmail':json.bikerContactEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'tripCostPerHr': json.tripCostPerHr, 'bikeMaintainanceScale':json.bikeMaintainanceScale},function (err,result){
+		dbc.insert({'tripId':json.tripId, 'bookingStartTimeHours':json.bookingStartTimeHours,'bookingStartTimeMinutes':json.bookingStartTimeMinutes,'bookingEndTimeHours':json.bookingEndTimeHours ,'bookingEndTimeMinutes':json.bookingEndTimeMinutes ,'bookingDay':json.bookingDay, 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'bikerContactEmail':json.bikerContactEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'tripCostPerHr': json.costPerHr},function (err,result){
 
 			if(err){
 				console.log(err);
@@ -80,7 +79,7 @@ function insertTrip(callback,json){
 	}
 }
 
-exports.insertTrip = insertTrip;
+exports.insertAdvancedTrip = insertAdvancedTrip;
 
 
 function updateTripStatus(json){
@@ -166,7 +165,7 @@ function removeTrip(json){
 
 exports.removeTrip = removeTrip;
 
-function findAllTrips(callback){
+function findAllTripsWithBikeId(callback,bikeId){
 
 	mongo.getConnection(function(err,coll){
 			if(err){
@@ -177,7 +176,7 @@ function findAllTrips(callback){
 			}
 	},collectionName);
 	
-	dbc.find(function(err,result){
+	dbc.find({'bikeId':bikeId},function(err,result){
 		
 		if(err){
 			console.log("No order exists.");
@@ -192,7 +191,7 @@ function findAllTrips(callback){
 	});
 }
 
-exports.findAllTrips = findAllTrips;
+exports.findAllTripsWithBikeId = findAllTripsWithBikeId;
 
 function findTripByTripId(callback,tripId){
 
@@ -219,36 +218,6 @@ function findTripByTripId(callback,tripId){
 	});
 }
 exports.findTripByTripId = findTripByTripId;
-
-
-function findTripByBikerContactEmail(callback,bikerContactEmail){
-
-	mongo.getConnection(function(err,coll){
-			if(err){
-				console.log("Error: "+err);
-			}
-			else{
-				dbc = coll;
-			}
-	},collectionName);
-	
-	dbc.find({"bikerContactEmail":bikerContactEmail},function(err,result){
-						
-		if(err){
-			console.log("No order exists.");
-			//db.close();
-			callback(err,new Error("Error: "+ err));
-		}
-		else{
-			//db.close();
-			callback(err,result);
-		}
-	});
-}
-
-exports.bikerContactEmail = bikerContactEmail;
-
-
 
 function extendTripTime(json){
 
@@ -282,41 +251,6 @@ function extendTripTime(json){
 
 
 exports.extendTripTime = extendTripTime;
-
-function updateMaintainanceScale(json){
-
-	if(json.bikeMaintainanceScale && json.percentage)
-	{
-		mongo.getConnection(function(err,coll){
-			if(err){
-				console.log("Error: "+err);
-			}
-			else{
-				dbc = coll;
-			}
-		},collectionName);
-
-		dbc.findAndModify({query: {"bikeMaintainanceScale": json.bikeMaintainanceScale },update: { $set: { "percentage": json.percentage } }, upsert: true },function(err,result){
-
-			if(err){
-				console.log(err);
-				//db.close();
-			}
-			else{
-				console.log("Successfully Updated.");
-				//db.close();
-			}
-		});
-	}
-	else{
-		console.log("Insufficient Data.");
-		//db.close();
-	}
-}
-
-exports.updateMaintainanceScale = updateMaintainanceScale;
-
-
 
 
 //Update bikeStation resourceCount & emptySlots based on dropOffPoint & bookingEndTime
