@@ -24,6 +24,7 @@ client.on("error", function (err) {
  exports.bikerLogin = function (req, res) {
 	if(!req.body.hasOwnProperty('bikerContactEmail') || !req.body.hasOwnProperty('bikerPassword')) {
 		res.statusCode = 400;
+		console.log(req);
 		return res.send('Error 400: Post syntax incorrect.');
 	}
 	var json = [];
@@ -50,6 +51,7 @@ client.on("error", function (err) {
 
 				//res.render('../views/bikeStations.ejs');
 				console.log("success");
+				res.render('select');
 			
 			}
 			

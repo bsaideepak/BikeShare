@@ -60,12 +60,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', controller.hello,controller.hi); //Record Current Location.
 app.post('/biker_login', controller.bikerLogin);  //User Login.
 app.post('/signup', controller.signup);  //User Signup/Registeration.
-app.post('/select', controller.checkSessionExists, controller.showSelectionPage);
+//app.post('/select', controller.checkSessionExists, controller.showSelectionPage);
 app.post('/rent', controller.checkSessionExists, controller.showMapsPlot);
 app.get('/bike_info/:bikeId', controller.checkSessionExists, controller.showSelectedBikeInfo);
+app.post('/trip_confirmation',controller.checkSessionExists, controller.tripConfirmation); 
 app.post('/extend_booking', controller.checkSessionExists, controller.extendExistingBooking);  
 //app.post('/advanced_booking',controller.checkSessionExists, controller.makeAdvancedBooking);   
-app.post('/trip_confirmation',controller.checkSessionExists, controller.tripConfirmation); 
 app.post('/change_password',controller.checkSessionExists, controller.changePassword); 
 app.post('/add_new_bike',controller.checkSessionExists, controller.addNewBike); 
 app.post('/report_dammage', controller.checkSessionExists, controller.reportDammage);

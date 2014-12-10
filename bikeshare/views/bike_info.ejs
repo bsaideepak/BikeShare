@@ -1,0 +1,84 @@
+<html>
+	<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src ="js/bike.js"></script>
+	
+	
+		<link rel="stylesheet" type="text/css" href="css/newStyle.css">
+	</head>
+	<body>
+	
+	<div id = "logomain">
+<img class = "logo" src="images/logo.png"></img></div>
+
+<div class="table-title">
+<h3>Select Bike</h3>
+</div>
+
+<table id ="bikeInfo"class="table-fill">
+<thead>
+<tr>
+<th class="text-left">Bike</th>
+<th class="text-left">Stat Time</th>
+<th class="text-left">End Time</th>
+<th class="text-left">Current Location</th>
+<th class="text-left">Select Bike</th>
+
+</tr>
+</thead>
+<tbody class="table-hover">
+<tr>
+<td class="text-left">Cruiser Bicycles</td>
+<td class="text-left">1.00</td>
+<td class="text-left">1.00</td>
+<td class="text-left">San Jose</td>
+<td class="text-left"> <a  onclick='getId("1");' class="action-button shadow animate blue">Select</a></td>
+</tr>
+
+</tbody>
+</table>
+
+<div class="table-title">
+<h3>Select Duration</h3>
+<label>
+<form action="/trip_confirmation" method="post">
+<span> Start Time  (Hours/Minutes) </span>
+    <select id="startHours">
+        <option selected> Select Hours </option>
+    </select>
+  <select id ="startMinutes" >
+ 
+         <option selected> Select Minutes </option>
+    </select>
+</label> 
+<br>
+<label>
+<span><br>End Time (Hours/Minutes) &nbsp; </span>
+    <select id="endHours">
+        <option selected> Select Hours </option>
+        
+    </select>
+  <select id="endMinutes">
+ 
+        <option selected> Select Minutes </option>
+        
+    </select>
+</label>
+</div>
+
+<div class="table-title">
+<h3>Pickup & DropOff</h3>
+<label>
+<span> Pickup Location </span> <input type="text" placeholder="pickup Location"></input>
+<span> DropOff Location </span> 
+<select id="dropLocation">
+        <option selected> DropOff Location </option>
+    </select>
+<label>
+</div>
+<br>
+<input type="hidden" id="bikeId"></input>
+<input style="width:150px;"type="submit" id="submitConfirm">Confirm</button>
+</form>
+	</body>
+</html>
