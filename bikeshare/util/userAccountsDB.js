@@ -6,34 +6,42 @@ var mongo = require("../util/MongoDBConnectionPool");
 var dbc="j";
 var collectionName = "userAccounts"; 
 
-function newUser(json){
+function newUser(callback,json){
 	
 	if(json.bikerContactEmail && json.bikerPassword){
 
+		console.log("Email: "+ json.bikerContactEmail );
+		console.log("Pass: "+ json.bikerPassword );
+
 		mongo.getConnection(function(err,coll){
-		if(err){
-			console.log("Error: "+err);
-		}
-		else{
-			dbc = coll;
-		}
-	},collectionName);	
+			if(err){
+				console.log("Error: "+err);
+			}
+			else{
+				dbc = coll;
+			}
+		},collectionName);	
 		
 		dbc.insert({'bikerContactEmail':json.bikerContactEmail,'bikerPassword':json.bikerPassword, 'bikerName':json.bikerName,'bikerContactAddress':json.bikerContactAddress, 'bikerContactPhone':json.bikerContactPhone },function (err,result){
 					
 			if(err){
 				console.log(err);
+				return res.send('Error 400: Error Creating a new user.');
 				//db.close();
 			}
 					
 			else{
+				var success = "New User Created.";
 				console.log("New User Created.");
+				callback(null,success);
 				//db.close();
 			}
 		});
 	}
 	else{
+		var fail = "Insufficient Data.";
 		console.log("Insufficient Data.");
+		callback(fail,null);
 		//db.close();
 	}
 }
@@ -120,7 +128,7 @@ exports.removeUser = removeUser;
 
 function userLogin(callback,json){
 	
-	if(json.userEmail && json.password){
+	if(json.bikerContactEmail && json.bikerPassword){
 
 		var authenticated;
 
@@ -138,6 +146,7 @@ function userLogin(callback,json){
 			if(err){
 				authenticated = 0;
 				console.log(err);
+				return res.send('Error 400: Error in Login.');
 				//db.close();
 			}
 					
@@ -158,24 +167,28 @@ function userLogin(callback,json){
 						{
 							authenticated = 1;
 							console.log("User Authenticated");
-							callback(err,authenticated);
+							callback(null,authenticated);
 						}
 						else
 						{
 							authenticated = 0;
 							console.log("User Not Authenticated");
-							callback(err,authenticated);
+							callback(null,authenticated);
 						}
 					}
 					else{
+						var authenticated = "User Does Not Exist.";
 						console.log("ERROR.");
+						callback(null,authenticated);
 					}
 				});
 			}
 		});
 	}
 	else{
+		var authenticated = "Insufficient Data.";
 		console.log("Insufficient Data.");
+		callback(null,authenticated);
 		//db.close();
 	}
 }

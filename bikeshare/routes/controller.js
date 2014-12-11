@@ -31,8 +31,8 @@ client.on("error", function (err) {
 	json.bikerContactEmail = req.body.bikerContactEmail;
 	json.bikerPassword = req.body.bikerPassword;
 
-	req.session.latitude = req.body.latitude;
-	req.session.longitude = req.body.longitude;
+	//req.session.latitude = req.body.latitude;
+	//req.session.longitude = req.body.longitude;
 
 	//latitude = req.session.latitude;
 	//longitude = req.session.longitude;
@@ -51,13 +51,14 @@ client.on("error", function (err) {
 
 				//res.render('../views/bikeStations.ejs');
 				console.log("success");
-				res.render('select');
+				return res.render('select');
 			
 			}
 			
 			else if(results==0)
 			{
 				console.log("Invalid Id or Password");
+				return res.send(err);
 				//res.render('../views/LogInError.ejs');
 			}
 		}
@@ -77,7 +78,7 @@ exports.hi = function(req,res){
 
 
 exports.signup = function (req, res) {
-	if(!req.body.hasOwnProperty('userEmail') || !req.body.hasOwnProperty('password') || !req.body.hasOwnProperty('bikerName') || !req.body.hasOwnProperty('bikerAddress') ) {
+	if(!req.body.hasOwnProperty('bikerContactEmail')  ) {
 		res.statusCode = 400;
 		return res.send('Error 400: Post syntax incorrect.');
 	}
@@ -88,7 +89,14 @@ exports.signup = function (req, res) {
 	json.bikerContactAddress = req.body.bikerContactAddress;
 	json.bikerContactPhone = req.body.bikerContactPhone;
 
-	userAccountsDB.newUser(json);
+	userAccountsDB.newUser(function(err,result){
+		if(!err){
+			return res.send("New User Created. Login to continue.");
+		}
+		else{
+			return res.send(err);
+		}
+	},json);
 
 }
 
@@ -114,28 +122,40 @@ exports.showSelectionPage = function(req,res){
 exports.showMapsPlot = function(req,res){
 	bikeDB.findAllBikesNotInUse(function(err,result){
 		if(!err){
-			res.render('showMapsPlot',{'json':result.toArray()});
+			console.log("No Error in rendering map ");
+			//return res.send("Error in rendering map ");
+			res.render('showMapsPlot',{'json':result});
 		}
 		else{
-			res.render('error');
+			//res.render('error');
+			console.log("Actual error. Maps Plot Not Ready to Render.");
+			return res.send("Actual error. Maps Plot Not Ready to Render." + err);
 		}
 	});
 }
 
 exports.showSelectedBikeInfo = function(req,res){
-	if(req.params.bikeId){
+	var query = require('url').parse(req.url,true).query;
+	var bikeId = query.bikeId;
+	console.log("BikeId: "+bikeId);
+	if(bikeId){
 
-		bikeDB.findBikeById(function(err,result){
+		console.log(bikeId);
+
+		bikeDB.findBikeById(function(err,docs){
 			if(!err){
-				res.render('bike_info',{'json':result.toArray()});
+				console.log("Error Rendering Page.");
+				res.render('bike_info',{'json':docs});
 			}
 			else{
-				res.render('error');
+				console.log("Database Error.");
+				return res.send('database error');
 			}
 
-		},bikeId);
+		},parseInt(bikeId));
 	}
 	else{
+		console.log("Error hitting the URL. Missing Parameters.");
 		res.render('error');
 	}
 }
@@ -143,12 +163,13 @@ exports.showSelectedBikeInfo = function(req,res){
 //Incomplete Extend Booking Feature.
 
 exports.extendExistingBooking = function(req, res){
-	if(!req.body.hasOwnProperty('tripId') || !req.body.hasOwnProperty('tripStatus')){
-		res.render('extend',{'json':"kson"});
-	}
-	else{
-		res.render('error');
-	}
+	//if(!req.body.hasOwnProperty('tripId') || !req.body.hasOwnProperty('tripStatus')){
+		//console.log("PLease Priint...");
+		res.render('extend',{'json':"json"});
+	//}
+	//else{
+		//res.render('error');
+	//}
 }
 
 exports.tripConfirmation = function(req, res) {

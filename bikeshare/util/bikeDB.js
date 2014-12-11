@@ -4,7 +4,7 @@
 
 var mongo = require("../util/MongoDBConnectionPool");
 var dbc="j";
-var collectionName = "bike";
+var collectionName = "bikeDB";
 
 function insertBike(callback,json){
 	
@@ -19,7 +19,7 @@ function insertBike(callback,json){
 			}
 		},collectionName);
 
-		dbc.insert({'bikeId':json.bikeId,'bikeName':json.bikeName, 'bikeCurrentLatitide': json.bikeCurrentLatitude, 'bikeCurrentLongitude': json.bikeCurrentLongitude, 'bikeCategoryScale':json.bikeCategoryScale, 'bikeAdvancedBookingFlag': json.bikeAdvancedBookingFlag, 'bikeInsuranceScale':json.bikeInsuranceScale, 'bikeMaintainanceScale':json.bikeMaintainanceScale, 'bikeLocationPremiumScale': json.bikeLocationPremiumScale, 'bikeOwnerContact': json.bikeOwnerContact, 'bikeOwnerName': json.bikeOwnerName, 'bikeInUseFlag': json.bikeInUseFlag},function (err,result){
+		dbc.insert({'bikeId':json.bikeId,'bikeName':json.bikeName, 'bikeCurrentLatitide': json.bikeCurrentLatitude, 'bikeCurrentLongitude': json.bikeCurrentLongitude, 'bikeCategoryScale':json.bikeCategoryScale, 'bikeAdvancedBookingFlag': json.bikeAdvancedBookingFlag, 'bikeInsuranceScale':json.bikeInsuranceScale, 'bikeMaintainanceScale':json.bikeMaintainanceScale, 'bikeLocationPremiumScale': json.bikeLocationPremiumScale, 'bikeOwnerContact': json.bikeOwnerContact, 'bikeOwnerName': json.bikeOwnerName, 'bikeInUseFlag': json.bikeInUseFlag, 'bikeAvailableFromHours':json.bikeAvailableFromHours, 'bikeAvailableFromMinutes':json.bikeAvailableFromMinutes, 'bikeAvailableUptoHours': json.bikeAvailableUptoHours, 'bikeAvailableUptoMinutes': json.bikeAvailableUptoMinutes},function (err,result){
 					
 			if(err){
 				console.log(err);
@@ -209,50 +209,99 @@ function findAllBikesNotInUse(callback){
 		}
 		else{
 			dbc = coll;
-		}
-	},collectionName);
-	
-	dbc.find({'bikeInUseFlag': 0},function(err,result){
 
-		if(err){
-			console.log("No order exists.");
-			//db.close();
-			callback(err,new Error("Error: "+ err));
+			dbc.find({'bikeInUseFlag': 0},function(err,result){
+
+				if(err){
+					console.log("No order exists.");
+					//db.close();
+					var errorMessage = "db error";
+					callback(errorMessage,null);
+				}
+				
+				else{
+					console.log("Results Success.");
+					callback(null,result);
+					//db.close();
+				}
+			});
 		}
-		else{
-			callback(err,result);
-			//db.close();
-		}
-	});
+
+	},collectionName);
 }
 
 
-exports.findAllBikesByCurrentStationId = findAllBikesByCurrentStationId;
+exports.findAllBikesNotInUse = findAllBikesNotInUse;
+
+
+function updateAvailableUpto(callback,bikeId,endTimeHours,endTimeMinutes){
+
+	mongo.getConnection(function(err,coll){
+		if(err){
+			console.log("Error: "+err);
+			var status = "Error: ";
+			callback(status,null);
+		}
+		else{
+			dbc = coll;
+
+			dbc.findAndModify({'bikeId': bikeId},[['_id','asc']],{$set: {"bikeAvailableFromHours":endTimeHours, "bikeAvailableFromMinutes":endTimeMinutes }}, function(err,result){
+
+				if(err){
+					console.log("Error Updating flag.");
+					var status = "Error Updating flag.";
+					callback(null,status);
+				}
+				else{
+					console.log("No Error Updating.");
+					var status = "No Error Updating.";
+					callback(null,status);
+				}
+			});
+		}
+	},collectionName);
+}
+
+exports.updateAvailableUpto = updateAvailableUpto;
 
 function findBikeById(callback, bikeId){
 
 	mongo.getConnection(function(err,coll){
 		if(err){
 			console.log("Error: "+err);
+			callback();
 		}
 		else{
 			dbc = coll;
+
+			dbc.find({'bikeId':bikeId},function(err,result){
+
+				if(err){
+					console.log("No bike exists.");
+					var status = "No bike exists.";
+					//db.close();
+					callback(status,null);
+				}
+		
+				else{
+
+					result.toArray(function(error,docs){
+						if(error){
+							var e = "Error With Callback.";
+							callback(e,null);
+						}
+						if(docs.length!=0){
+							callback(null,docs);
+						}
+						else{
+							console.log("No results fetched.");
+						}
+						callback(null,docs);
+					});
+				}
+			});
 		}
 	},collectionName);
-					
-	dbc.find({'bikeId':bikeId},function(err,result){
-
-		if(err){
-			console.log("No bike exists.");
-			//db.close();
-			callback(err,new Error("Error: "+ err));
-		}
-		
-		else{
-			callback(err,result);
-			//db.close();
-		}
-	});
 }
 
 exports.findBikeById = findBikeById;

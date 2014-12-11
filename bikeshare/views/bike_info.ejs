@@ -27,12 +27,13 @@
 </tr>
 </thead>
 <tbody class="table-hover">
+<% json.forEach(function(json){%>
 <tr>
-<td class="text-left">Cruiser Bicycles</td>
-<td class="text-left">1.00</td>
-<td class="text-left">1.00</td>
-<td class="text-left">San Jose</td>
-<td class="text-left"> <a  onclick='getId("1");' class="action-button shadow animate blue">Select</a></td>
+<td class="text-left"><%=json.bikeName%></td>
+<td class="text-left"><%=json.bikeAvailableFromHours%> | <%=json.bikeAvailableFromMinutes%></td>
+<td class="text-left"><%=json.bikeAvailableUptoHours%> | <%=json.bikeAvailableUptoMinutes%>></td>
+<td class="text-left"><%=json.bikeCurrentLatitide%> | <%=json.bikeCurrentLongitude%> </td>
+<td class="text-left"> <a  onclick='getId("<%=json.bikeId%>");' class="action-button shadow animate blue">Select</a></td>
 </tr>
 
 </tbody>
@@ -43,10 +44,10 @@
 <label>
 <form action="/trip_confirmation" method="post">
 <span> Start Time  (Hours/Minutes) </span>
-    <select id="startHours">
+    <select id="startHours" name="startHours">
         <option selected> Select Hours </option>
     </select>
-  <select id ="startMinutes" >
+  <select id ="startMinutes"  name="startMinutes">
  
          <option selected> Select Minutes </option>
     </select>
@@ -54,11 +55,11 @@
 <br>
 <label>
 <span><br>End Time (Hours/Minutes) &nbsp; </span>
-    <select id="endHours">
+    <select id="endHours" name="endHours">
         <option selected> Select Hours </option>
         
     </select>
-  <select id="endMinutes">
+  <select id="endMinutes" name="endMinutes">
  
         <option selected> Select Minutes </option>
         
@@ -68,16 +69,25 @@
 
 <div class="table-title">
 <h3>Pickup & DropOff</h3>
+
 <label>
-<span> Pickup Location </span> <input type="text" placeholder="pickup Location"></input>
-<span> DropOff Location </span> 
-<select id="dropLocation">
+<span> Pickup Location : <%=json.bikeCurrentLatitide%> | <%=json.bikeCurrentLongitude%> </span>
+<span> &nbsp;&nbsp;DropOff Location </span> 
+<select id="dropLocation" name="dropLocation">
         <option selected> DropOff Location </option>
+         <option> MLK Library</option>
+          <option> Caltrain Station </option>
+           <option> Boccardo Business Center </option>
+            <option> Pink Poodle </option>
+            <option> City Hall </option>
+            <option> 101 San Fernando </option>
     </select>
 <label>
+<%})%>
 </div>
 <br>
 <input type="hidden" id="bikeId"></input>
+
 <input style="width:150px;"type="submit" id="submitConfirm">Confirm</button>
 </form>
 	</body>

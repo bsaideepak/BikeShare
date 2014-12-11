@@ -61,18 +61,18 @@ app.get('/', controller.hello,controller.hi); //Record Current Location.
 app.post('/biker_login', controller.bikerLogin);  //User Login.
 app.post('/signup', controller.signup);  //User Signup/Registeration.
 //app.post('/select', controller.checkSessionExists, controller.showSelectionPage);
-app.post('/rent', controller.checkSessionExists, controller.showMapsPlot);
-app.get('/bike_info/:bikeId', controller.checkSessionExists, controller.showSelectedBikeInfo);
-app.post('/trip_confirmation',controller.checkSessionExists, controller.tripConfirmation); 
-app.post('/extend_booking', controller.checkSessionExists, controller.extendExistingBooking);  
-//app.post('/advanced_booking',controller.checkSessionExists, controller.makeAdvancedBooking);   
-app.post('/change_password',controller.checkSessionExists, controller.changePassword); 
-app.post('/add_new_bike',controller.checkSessionExists, controller.addNewBike); 
-app.post('/report_dammage', controller.checkSessionExists, controller.reportDammage);
-app.post('/return_bike', controller.checkSessionExists, controller.returnBike);
-app.post('/view_all_my_rides', controller.checkSessionExists, controller.viewAllMyRides);
-app.post('/bikeOnwer', controller.checkSessionExists, controller.adminFunctions);
-app.post('/bikeOwner_cost_scales_confirmation', controller.checkSessionExists, controller.adminFunctionsConfirmation);
+app.get('/rent'/*,controller.checkSessionExists*/, controller.showMapsPlot);
+app.get('/bike_info' /*,controller.checkSessionExists*/, controller.showSelectedBikeInfo);
+app.post('/trip_confirmation' /*,controller.checkSessionExists*/, controller.tripConfirmation); 
+app.get('/extend_booking' /*,controller.checkSessionExists*/, controller.extendExistingBooking);  
+//app.get('/advanced_booking' /*,controller.checkSessionExists */, controller.makeAdvancedBooking);   
+app.post('/change_password' /*,controller.checkSessionExists*/, controller.changePassword); 
+app.post('/add_new_bike' /*,controller.checkSessionExists*/, controller.addNewBike); 
+app.post('/report_damage' /*,controller.checkSessionExists*/, controller.reportDammage);
+app.post('/return_bike' /*,controller.checkSessionExists*/, controller.returnBike);
+app.post('/view_all_my_rides' /*,controller.checkSessionExists*/, controller.viewAllMyRides);
+app.post('/bikeOnwer' /*,controller.checkSessionExists*/, controller.adminFunctions);
+app.post('/bikeOwner_cost_scales_confirmation' /*,controller.checkSessionExists*/, controller.adminFunctionsConfirmation);
 
 app.all('*', function(req, res){
     res.render('homepage');

@@ -80,18 +80,12 @@ var myVar=setInterval(function () {calculateHours()}, 10000);
 	}
 	}
 	
-	$.ajax({
-				type: "POST",
-				contentType: "application/json",
-				url: "http://localhost:8080/hope/api/orderhistory",
-				data: JSON.stringify({username:customerId}),
-				dataType: "json",
-				success : function(data){
+	
+	$("submitConfirm").click(function (){
 			
-						for(var i=0;i < data.length;i++)
-							{
-							$('#products').append(
-								'<tr><td class="text-left" >'+data[i].bikeName+'</td><td class="text-left">'+data[i].avaliableStartTime+'</td><td class="text-left">'+data[i].avaliableEndTime+'</td><td class="text-left">'+data[i].currentLocation+'</td><td class="text-left"><button id="hello">Cancel</button></td></tr>');
-							}
-							}
-							});
+	});
+
+	function getId(id){
+		idValue = id;
+		document.getElementById("bikeId").value = idValue
+	}

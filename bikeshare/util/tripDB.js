@@ -58,7 +58,7 @@ function insertTrip(callback,json){
 			}
 		},costOverheads);
 
-		dbc.insert({'tripId':json.tripId, 'bookingStartTimeHours':json.bookingStartTimeHours,'bookingStartTimeMinutes':json.bookingStartTimeMinutes,'bookingEndTimeHours':json.bookingEndTimeHours ,'bookingEndTimeMinutes':json.bookingEndTimeMinutes , 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'bikerContactEmail':json.bikerContactEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':json.tripStatus, 'tripCostPerHr': json.tripCostPerHr, 'bikeMaintainanceScale':json.bikeMaintainanceScale},function (err,result){
+		dbc.insert({'tripId':json.tripId, 'bookingStartTimeHours':json.bookingStartTimeHours,'bookingStartTimeMinutes':json.bookingStartTimeMinutes,'bookingEndTimeHours':json.bookingEndTimeHours ,'bookingEndTimeMinutes':json.bookingEndTimeMinutes , 'pickUpPoint':json.pickUpPoint ,'dropOffPoint':json.dropOffPoint ,'bikerContactEmail':json.bikerContactEmail ,'bikeId':json.bikeId ,'bikeName':json.bikeName ,'tripStatus':1, 'tripCostPerHr': json.tripCostPerHr, 'bikeMaintainanceScale':json.bikeMaintainanceScale},function (err,result){
 
 			if(err){
 				console.log(err);
@@ -66,6 +66,19 @@ function insertTrip(callback,json){
 			}
 			
 			else{
+
+				bikeDB.updateAvailableUpto(function(error,updated){
+
+					if(!error){
+						console.log("BikeDB Time Updated.");
+					}
+					else{
+						console.log("Error updating AvailableStartTime for bikeId.");
+					}
+
+				},json.bikeId, json.bookingEndTimeHours,bookingEndTimeMinutes);
+
+
 				var status = "Successfully Inserted";
 				//db.close();
 				console.log("Operation Successful.");
@@ -220,7 +233,7 @@ function findTripByTripId(callback,tripId){
 exports.findTripByTripId = findTripByTripId;
 
 
-function findTripByBikerContactEmail(callback,bikerContactEmail){
+function findTripByBikerContactEmailAndStatus(callback,bikerContactEmail){
 
 	mongo.getConnection(function(err,coll){
 			if(err){
@@ -231,7 +244,7 @@ function findTripByBikerContactEmail(callback,bikerContactEmail){
 			}
 	},collectionName);
 	
-	dbc.find({"bikerContactEmail":bikerContactEmail},function(err,result){
+	dbc.find({"bikerContactEmail":bikerContactEmail, 'tripStatus': 1},function(err,result){
 						
 		if(err){
 			console.log("No order exists.");
@@ -245,7 +258,7 @@ function findTripByBikerContactEmail(callback,bikerContactEmail){
 	});
 }
 
-exports.findTripByBikerContactEmail = findTripByBikerContactEmail;
+exports.findTripByBikerContactEmailAndStatus = findTripByBikerContactEmailAndStatus;
 
 
 
